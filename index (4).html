@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nawa Cahaya — Sistem Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   NAWA CAHAYA — DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --deep:   #1B4332; --mid:    #2D6A4F; --light:  #52B788; --mint:   #95D5B2;
+  --gold:   #D4A017; --goldf:  #F9C74F; --cream:  #FFFDE7;
+  --bg:     #0C1510; --panel:  #111E17; --card:   #172419; --border: #1E3428;
+  --text:   #E8F0EB; --muted:  #6B8F78; --white:  #FFFFFF;
+  --red:    #E05252; --blue:   #4A9ECC; --purple: #9B59B6;
+  --sidebar-w: 260px;
+  --topbar-h:  58px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+       min-height: 100vh; overflow-x: hidden; }
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--panel); }
+::-webkit-scrollbar-thumb { background: var(--mid); border-radius: 2px; }
+button, input, select, textarea { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+
+/* ── SCREEN MANAGER ── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+#screen-login { align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 30% 40%, rgba(45,106,79,.25) 0%, transparent 60%),
+              radial-gradient(ellipse at 75% 70%, rgba(212,160,23,.1) 0%, transparent 50%),
+              var(--bg); }
+#screen-app { flex-direction: row; }
+
+/* ══════════════════════════════════════════════════════════
+   LOGIN SCREEN
+   ══════════════════════════════════════════════════════════ */
+.login-wrap { width: 100%; max-width: 440px; padding: 2rem; }
+.login-logo { text-align: center; margin-bottom: 2.5rem; }
+.login-logo .logo-icon { font-size: 3rem; display: block; margin-bottom: .6rem; }
+.login-logo h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem;
+  color: var(--white); font-weight: 800; }
+.login-logo p { font-size: .82rem; color: var(--mint); margin-top: .2rem; }
+
+.login-card { background: var(--panel); border: 1px solid var(--border);
+  border-radius: 18px; padding: 2rem; position: relative; overflow: hidden; }
+.login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--mid), var(--gold), var(--light)); }
+
+.login-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; color: var(--text); }
+.login-sub { font-size: .8rem; color: var(--muted); margin-bottom: 1.6rem; }
+
+.role-tabs { display: flex; gap: .4rem; margin-bottom: 1.5rem;
+  background: var(--card); border-radius: 10px; padding: .3rem; }
+.role-tab { flex: 1; padding: .52rem; border-radius: 7px; font-size: .78rem; font-weight: 600;
+  cursor: pointer; border: none; color: var(--muted); background: none;
+  transition: all .2s; text-align: center; }
+.role-tab.active { background: var(--deep); color: var(--goldf); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+
+.form-group { margin-bottom: 1rem; }
+.form-label { display: block; font-size: .73rem; font-weight: 600; color: var(--muted);
+  margin-bottom: .35rem; letter-spacing: .04em; text-transform: uppercase; }
+.form-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 9px; padding: .65rem 1rem; font-size: .9rem; color: var(--text);
+  transition: border-color .2s, box-shadow .2s; outline: none; }
+.form-input:focus { border-color: var(--light); box-shadow: 0 0 0 3px rgba(82,183,136,.12); }
+.form-input::placeholder { color: rgba(107,143,120,.4); }
+
+.btn-login { width: 100%; padding: .82rem; background: linear-gradient(135deg, var(--mid), var(--light));
+  color: var(--white); font-size: .95rem; font-weight: 700; border: none; border-radius: 10px;
+  cursor: pointer; transition: all .2s; box-shadow: 0 4px 16px rgba(82,183,136,.25); margin-top: .5rem; }
+.btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(82,183,136,.35); }
+
+.login-hint { text-align: center; margin-top: 1.2rem; font-size: .75rem; color: var(--muted); }
+.login-hint strong { color: var(--goldf); }
+
+.setup-strip { margin-top: 1.5rem; background: rgba(212,160,23,.08); border: 1px solid rgba(212,160,23,.2);
+  border-radius: 10px; padding: .9rem 1rem; }
+.setup-strip p { font-size: .76rem; color: rgba(249,199,74,.7); margin-bottom: .4rem; }
+.setup-strip input { width: 100%; background: rgba(0,0,0,.3); border: 1px solid rgba(212,160,23,.2);
+  border-radius: 6px; padding: .38rem .7rem; font-size: .76rem; color: var(--goldf);
+  outline: none; margin-bottom: .4rem; }
+.setup-strip button { background: var(--gold); color: var(--deep); padding: .32rem .9rem;
+  border-radius: 5px; font-size: .76rem; font-weight: 700; border: none; cursor: pointer; }
+
+/* ══════════════════════════════════════════════════════════
+   APP LAYOUT — SIDEBAR
+   ══════════════════════════════════════════════════════════ */
+#sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--panel);
+  border-right: 1px solid var(--border); display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; height: 100vh; z-index: 50; overflow-y: auto;
+  transition: transform .3s; }
+.sb-logo { padding: 1.1rem 1.2rem .9rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: .7rem; }
+.sb-logo-icon { font-size: 1.7rem; }
+.sb-logo .nm { font-family: 'Playfair Display', serif; font-size: .95rem;
+  color: var(--goldf); font-weight: 700; }
+.sb-logo .tg { font-size: .6rem; color: var(--muted); display: block; letter-spacing: .06em; }
+
+.sb-user { padding: .7rem 1.1rem; border-bottom: 1px solid var(--border); }
+.sb-user-card { background: var(--card); border-radius: 9px; padding: .6rem .8rem;
+  display: flex; align-items: center; gap: .6rem; }
+.sb-av { width: 30px; height: 30px; border-radius: 50%; background: var(--deep);
+  display: flex; align-items: center; justify-content: center; font-size: .8rem;
+  color: var(--mint); flex-shrink: 0; border: 1px solid var(--mid); font-weight: 700; }
+.sb-user-info .un { font-size: .8rem; font-weight: 600; color: var(--text); }
+.sb-user-info .ur { font-size: .62rem; color: var(--muted); }
+.sb-conn { width: 7px; height: 7px; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
+.sb-conn.on { background: var(--light); box-shadow: 0 0 0 2px rgba(82,183,136,.2);
+  animation: pulse 2s infinite; }
+.sb-conn.off { background: var(--muted); }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+.sb-nav { flex: 1; padding: .6rem 0; }
+.sb-sec { padding: .4rem 1.2rem .15rem; font-size: .58rem; font-weight: 700;
+  letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
+.sb-item { display: flex; align-items: center; gap: .65rem; padding: .5rem 1.2rem;
+  margin: .05rem .5rem; border-radius: 8px; font-size: .82rem; font-weight: 500;
+  color: var(--muted); cursor: pointer; transition: all .15s; position: relative; }
+.sb-item:hover { background: rgba(82,183,136,.08); color: var(--text); }
+.sb-item.active { background: rgba(82,183,136,.14); color: var(--mint);
+  border-left: 2px solid var(--gold); padding-left: calc(1.2rem - 2px); }
+.sb-item.active .sb-ic { color: var(--gold); }
+.sb-ic { font-size: .9rem; width: 17px; text-align: center; flex-shrink: 0; }
+.sb-badge { margin-left: auto; background: var(--gold); color: var(--deep);
+  font-size: .58rem; font-weight: 800; padding: .1rem .38rem; border-radius: 20px; min-width: 16px; text-align: center; }
+.sb-new { font-size: .55rem; background: var(--red); color: white;
+  padding: .08rem .35rem; border-radius: 20px; margin-left: auto; font-weight: 700; }
+
+.sb-footer { padding: .8rem 1.1rem; border-top: 1px solid var(--border); }
+.btn-logout { width: 100%; padding: .5rem; background: rgba(224,82,82,.08);
+  border: 1px solid rgba(224,82,82,.2); border-radius: 8px; color: var(--red);
+  font-size: .78rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+.btn-logout:hover { background: rgba(224,82,82,.15); }
+
+/* ── MAIN AREA ── */
+#main-area { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh;
+  display: flex; flex-direction: column; }
+
+/* ── TOPBAR ── */
+.topbar { height: var(--topbar-h); background: var(--panel); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.6rem; position: sticky; top: 0; z-index: 40; gap: 1rem; }
+.tb-left h2 { font-size: .95rem; font-weight: 600; color: var(--text); }
+.tb-left p { font-size: .7rem; color: var(--muted); }
+.tb-right { display: flex; align-items: center; gap: .6rem; }
+.tb-badge { background: rgba(82,183,136,.1); border: 1px solid rgba(82,183,136,.25);
+  color: var(--mint); font-size: .68rem; padding: .22rem .65rem; border-radius: 20px;
+  display: flex; align-items: center; gap: .3rem; white-space: nowrap; }
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--light); animation: pulse 2s infinite; }
+.tb-btn { padding: .38rem .9rem; border-radius: 7px; font-size: .78rem; font-weight: 600;
+  cursor: pointer; border: none; transition: all .18s; }
+.tb-btn-gold { background: var(--gold); color: var(--deep); }
+.tb-btn-gold:hover { background: var(--goldf); }
+.tb-btn-outline { background: rgba(82,183,136,.1); border: 1px solid rgba(82,183,136,.25);
+  color: var(--mint); }
+.tb-btn-outline:hover { background: rgba(82,183,136,.2); }
+.tb-btn.spin-active .sync-icon { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.sync-icon { display: inline-block; }
+
+/* ── CONTENT ── */
+.content { flex: 1; padding: 1.5rem 1.6rem; }
+.page-section { display: none; }
+.page-section.active { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+
+/* ── PAGE HEADER ── */
+.ph { margin-bottom: 1.5rem; }
+.ph-badge { display: inline-block; font-size: .6rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--gold); background: rgba(212,160,23,.1);
+  border: 1px solid rgba(212,160,23,.2); padding: .18rem .65rem; border-radius: 20px; margin-bottom: .4rem; }
+.ph-title { font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 800;
+  color: var(--text); margin-bottom: .15rem; line-height: 1.2; }
+.ph-sub { font-size: .82rem; color: var(--muted); }
+
+/* ── STAT CARDS ── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr));
+  gap: .85rem; margin-bottom: 1.5rem; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.1rem 1.3rem; position: relative; overflow: hidden; cursor: default; transition: transform .2s; }
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px; }
+.sc-green::before { background: var(--light); }
+.sc-gold::before { background: var(--gold); }
+.sc-blue::before { background: var(--blue); }
+.sc-red::before { background: var(--red); }
+.sc-purple::before { background: var(--purple); }
+.stat-label { font-size: .65rem; color: var(--muted); font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; margin-bottom: .3rem; }
+.stat-val { font-size: 1.65rem; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: .15rem; }
+.stat-sub { font-size: .68rem; color: var(--muted); }
+.stat-badge { position: absolute; top: .9rem; right: .9rem; font-size: .65rem; font-weight: 600;
+  padding: .14rem .4rem; border-radius: 5px; }
+.up { background: rgba(82,183,136,.15); color: var(--light); }
+.dn { background: rgba(224,82,82,.15); color: var(--red); }
+
+/* ── CARDS / PANELS ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  overflow: hidden; margin-bottom: 1.2rem; }
+.card-head { padding: .85rem 1.2rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.card-head-title { font-size: .8rem; font-weight: 700; color: var(--text); letter-spacing: .03em; }
+.card-body { padding: 1.1rem; }
+.card-body-pad { padding: 1.1rem 1.2rem; }
+
+/* ── GRID LAYOUTS ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+.g7030 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; }
+table.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { text-align: left; font-size: .63rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); padding: .55rem .85rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.tbl td { padding: .6rem .85rem; border-bottom: 1px solid rgba(30,52,40,.4); font-size: .8rem; }
+.tbl tr:hover td { background: rgba(82,183,136,.04); }
+.tbl tr:last-child td { border-bottom: none; }
+
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; gap: .25rem; font-size: .65rem;
+  font-weight: 600; padding: .15rem .52rem; border-radius: 20px; white-space: nowrap; }
+.b-green { background: rgba(82,183,136,.15); color: var(--light); }
+.b-gold { background: rgba(212,160,23,.15); color: var(--goldf); }
+.b-red { background: rgba(224,82,82,.15); color: var(--red); }
+.b-blue { background: rgba(74,158,204,.15); color: var(--blue); }
+.b-muted { background: rgba(107,143,120,.12); color: var(--muted); }
+.b-purple { background: rgba(155,89,182,.15); color: var(--purple); }
+
+/* ── PROGRESS ── */
+.prog-wrap { margin: .4rem 0; }
+.prog-label { display: flex; justify-content: space-between; font-size: .7rem; margin-bottom: .22rem; }
+.prog-label span:first-child { color: var(--muted); }
+.prog-label span:last-child { color: var(--goldf); font-weight: 600; }
+.prog-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.prog-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--mid), var(--light)); transition: width 1.2s ease; }
+.prog-bar-fill.gold { background: linear-gradient(90deg, var(--gold), var(--goldf)); }
+
+/* ── FORM ELEMENTS ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; margin-bottom: .9rem; }
+.form-group-sm { margin-bottom: .85rem; }
+.fl { display: block; font-size: .7rem; font-weight: 600; color: var(--muted);
+  margin-bottom: .28rem; letter-spacing: .04em; text-transform: uppercase; }
+.fl .req { color: var(--red); margin-left: .1rem; }
+.fi { width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: .58rem .85rem; font-size: .86rem; color: var(--text);
+  transition: border-color .2s; outline: none; }
+.fi:focus { border-color: var(--light); }
+select.fi option { background: var(--panel); }
+textarea.fi { resize: vertical; min-height: 72px; }
+.btn { padding: .56rem 1.2rem; border-radius: 8px; font-size: .82rem; font-weight: 600;
+  cursor: pointer; border: none; transition: all .17s; }
+.btn-primary { background: var(--light); color: var(--deep); }
+.btn-primary:hover { background: var(--mint); }
+.btn-gold { background: var(--gold); color: var(--deep); }
+.btn-gold:hover { background: var(--goldf); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-outline:hover { border-color: var(--light); color: var(--text); }
+.btn-danger { background: rgba(224,82,82,.1); border: 1px solid rgba(224,82,82,.2); color: var(--red); }
+.btn-sm { padding: .3rem .75rem; font-size: .74rem; }
+.btn-gap { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+/* ── CHART WRAPPER ── */
+.chart-wrap { position: relative; }
+.chart-wrap.h180 { height: 180px; }
+.chart-wrap.h220 { height: 220px; }
+.chart-wrap.h260 { height: 260px; }
+
+/* ── ACTIVITY FEED ── */
+.act-item { display: flex; gap: .75rem; padding: .6rem 0;
+  border-bottom: 1px solid rgba(30,52,40,.35); }
+.act-item:last-child { border-bottom: none; }
+.act-icon { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: .8rem; }
+.act-body .act-t { font-size: .8rem; color: var(--text); margin-bottom: .04rem; }
+.act-body .act-m { font-size: .67rem; color: var(--muted); }
+
+/* ── MODAL ── */
+#modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75);
+  z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+#modal-overlay.open { display: flex; }
+.modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  width: 520px; max-width: 100%; max-height: 88vh; overflow-y: auto;
+  animation: modalIn .22s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)} }
+.modal-head { padding: 1.2rem 1.4rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; }
+.modal-head h3 { font-size: 1rem; font-weight: 700; color: var(--goldf); }
+.modal-close { font-size: 1.1rem; cursor: pointer; color: var(--muted); }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 1.4rem; }
+.modal-footer { padding: 1rem 1.4rem; border-top: 1px solid var(--border);
+  display: flex; gap: .6rem; justify-content: flex-end; }
+
+/* ── TOAST NOTIF ── */
+#toast { position: fixed; bottom: 1.4rem; right: 1.4rem; z-index: 400;
+  background: var(--deep); border: 1px solid var(--light); border-radius: 10px;
+  padding: .7rem 1.1rem; font-size: .82rem; color: var(--mint);
+  transform: translateY(80px); opacity: 0; transition: all .3s; pointer-events: none; max-width: 280px; }
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.err { border-color: var(--red); color: var(--red); }
+
+/* ── ALERT ── */
+.alert { padding: .7rem 1rem; border-radius: 9px; font-size: .82rem; margin-bottom: 1rem;
+  display: flex; align-items: flex-start; gap: .55rem; }
+.al-warn { background: rgba(212,160,23,.09); border: 1px solid rgba(212,160,23,.22); color: var(--goldf); }
+.al-info { background: rgba(74,158,204,.09); border: 1px solid rgba(74,158,204,.22); color: var(--blue); }
+.al-success { background: rgba(82,183,136,.09); border: 1px solid rgba(82,183,136,.22); color: var(--light); }
+
+/* ── TRANSPARENCY TICKER ── */
+.trans-ticker { background: rgba(82,183,136,.06); border: 1px solid rgba(82,183,136,.15);
+  border-radius: 8px; padding: .55rem 1rem; font-size: .77rem; color: var(--mint);
+  display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.trans-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--light); animation: pulse 1.5s infinite; }
+
+/* ── DONOR ROI CARD ── */
+.roi-card { background: linear-gradient(135deg, var(--deep) 0%, #0f2d1f 100%);
+  border: 1px solid rgba(212,160,23,.25); border-radius: 14px; padding: 1.4rem; margin-bottom: 1.2rem; }
+.roi-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--goldf); margin-bottom: .5rem; }
+.roi-number { font-size: 2.4rem; font-weight: 700; color: var(--white); line-height: 1; }
+.roi-label { font-size: .75rem; color: var(--mint); margin-top: .15rem; }
+
+/* ── PAKET CARD ── */
+.paket-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-bottom: 1.2rem; }
+.paket-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.2rem; cursor: pointer; transition: all .2s; position: relative; }
+.paket-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.paket-card.selected { border-color: var(--gold); background: rgba(212,160,23,.06); }
+.paket-card .pk-icon { font-size: 1.6rem; margin-bottom: .6rem; }
+.paket-card .pk-name { font-size: .9rem; font-weight: 700; color: var(--goldf); margin-bottom: .2rem; }
+.paket-card .pk-price { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: .4rem; }
+.paket-card .pk-desc { font-size: .75rem; color: var(--muted); line-height: 1.5; }
+.paket-card .pk-badge { position: absolute; top: .7rem; right: .7rem; }
+
+/* ── PUBLIC FORM ── */
+.pub-hero { background: var(--deep); padding: 2.5rem 1.5rem 3rem; text-align: center; position: relative; overflow: hidden; }
+.pub-hero::before { content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(82,183,136,.1) 0%, transparent 60%); }
+.pub-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem,4vw,2.4rem);
+  color: var(--white); font-weight: 800; margin-bottom: .4rem; position: relative; }
+.pub-hero h1 em { color: var(--goldf); font-style: italic; }
+.pub-hero p { font-size: .9rem; color: var(--mint); max-width: 460px; margin: 0 auto 1.4rem; position: relative; }
+.pub-stats { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; position: relative; }
+.pub-stat .pv { font-size: 1.4rem; font-weight: 700; color: var(--goldf); display: block; }
+.pub-stat .pl { font-size: .68rem; color: var(--mint); text-transform: uppercase; letter-spacing: .06em; }
+
+.pub-tabs-wrap { max-width: 640px; margin: 0 auto; padding: 0 1.5rem; transform: translateY(-1.4rem); }
+.pub-tabs { display: flex; background: var(--white); border-radius: 12px; padding: .3rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15); }
+.pub-tab { flex: 1; padding: .68rem; border-radius: 9px; font-size: .84rem; font-weight: 600;
+  cursor: pointer; border: none; font-family: inherit; color: var(--deep); background: none; transition: all .2s; }
+.pub-tab.active { background: var(--deep); color: var(--white); }
+
+.pub-panels { max-width: 640px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+.pub-panel { display: none; }
+.pub-panel.active { display: block; animation: fadeUp .3s ease; }
+.pub-form-card { background: var(--white); border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.08); overflow: hidden; }
+.pfc-head { background: linear-gradient(135deg, var(--deep), var(--mid));
+  padding: 1.2rem 1.5rem; }
+.pfc-head h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--white); font-weight: 700; }
+.pfc-head p { font-size: .75rem; color: var(--mint); margin-top: .15rem; }
+.pfc-body { padding: 1.5rem; }
+.pfc-body .fl { color: #5a7a66; }
+.pfc-body .fi { background: var(--white); border: 1.5px solid #D0E4D8; color: #1a2e22; }
+.pfc-body .fi:focus { border-color: var(--light); }
+.btn-submit-pub { width: 100%; padding: .85rem; background: linear-gradient(135deg, var(--mid), var(--light));
+  color: var(--white); font-size: .92rem; font-weight: 700; border: none; border-radius: 10px;
+  cursor: pointer; transition: all .2s; margin-top: 1rem; }
+.btn-submit-pub:hover { box-shadow: 0 6px 18px rgba(82,183,136,.3); transform: translateY(-1px); }
+.btn-submit-pub.gold-btn { background: linear-gradient(135deg, var(--gold), var(--goldf)); color: var(--deep); }
+.success-box { text-align: center; padding: 2rem; display: none; }
+.success-box.show { display: block; animation: fadeUp .3s ease; }
+.success-box .si { font-size: 2.8rem; margin-bottom: .8rem; }
+.success-box h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--deep); font-weight: 700; margin-bottom: .4rem; }
+.success-box p { font-size: .84rem; color: var(--muted); }
+.pub-footer { background: var(--deep); color: var(--mint); text-align: center; padding: 1.2rem; font-size: .76rem; }
+.pub-footer strong { color: var(--goldf); }
+
+/* ── AMOUNT GRID ── */
+.amount-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; margin-bottom: .8rem; }
+.amount-btn { padding: .55rem .4rem; border-radius: 7px; border: 1.5px solid #D0E4D8;
+  background: var(--white); cursor: pointer; transition: all .15s; font-family: inherit; }
+.amount-btn.sel { border-color: var(--light); background: rgba(82,183,136,.08); }
+.amount-btn .an { font-size: .88rem; font-weight: 700; color: #1a2e22; display: block; }
+.amount-btn .ad { font-size: .65rem; color: #5a7a66; }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 2.2rem; color: var(--muted); font-size: .82rem; }
+.empty-icon { font-size: 1.8rem; opacity: .5; margin-bottom: .5rem; }
+
+/* ── ANAK BINAAN CARD GRID ── */
+.anak-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1rem; }
+.anak-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem;
+  cursor: pointer; transition: border-color .2s; }
+.anak-card:hover { border-color: var(--mid); }
+.anak-av { width: 44px; height: 44px; border-radius: 50%; background: var(--deep);
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  margin-bottom: .7rem; border: 2px solid var(--mid); }
+.anak-name { font-size: .88rem; font-weight: 600; color: var(--text); margin-bottom: .15rem; }
+.anak-prog { font-size: .72rem; color: var(--muted); margin-bottom: .5rem; }
+.anak-skill-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.anak-skill-fill { height: 100%; background: linear-gradient(90deg, var(--mid), var(--light)); border-radius: 2px; }
+
+/* ── VOLUNTEER TABLE ACTION ── */
+.act-btn { padding: .25rem .6rem; border-radius: 5px; font-size: .7rem; font-weight: 600;
+  cursor: pointer; border: 1px solid; transition: all .15s; }
+.act-btn-g { border-color: rgba(82,183,136,.3); color: var(--light); background: rgba(82,183,136,.08); }
+.act-btn-g:hover { background: rgba(82,183,136,.18); }
+.act-btn-r { border-color: rgba(224,82,82,.3); color: var(--red); background: rgba(224,82,82,.06); }
+.act-btn-r:hover { background: rgba(224,82,82,.14); }
+
+/* ── CONN SETUP BANNER ── */
+.conn-banner { background: rgba(212,160,23,.08); border-bottom: 1px solid rgba(212,160,23,.25);
+  padding: .55rem 1.6rem; display: flex; align-items: center; gap: .8rem; font-size: .79rem; color: var(--goldf); }
+.conn-banner input { flex: 1; max-width: 460px; background: rgba(0,0,0,.2);
+  border: 1px solid rgba(212,160,23,.25); border-radius: 6px; padding: .3rem .75rem;
+  color: var(--goldf); font-size: .79rem; outline: none; }
+.conn-banner.connected { background: rgba(82,183,136,.07); border-color: rgba(82,183,136,.2); color: var(--mint); }
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px) {
+  .g2,.g3,.g7030 { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+@media (max-width:700px) {
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  #main-area { margin-left: 0; }
+  .mobile-menu-btn { display: flex; }
+}
+.mobile-menu-btn { display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px; background: var(--card);
+  border: 1px solid var(--border); cursor: pointer; font-size: 1.1rem; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LOGIN SCREEN
+     ═══════════════════════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+<div class="login-wrap">
+  <div class="login-logo">
+    <span class="logo-icon">🌿</span>
+    <h1>Nawa Cahaya</h1>
+    <p>Sistem Dashboard Terpadu</p>
+  </div>
+  <div class="login-card">
+    <div class="login-title">Selamat Datang</div>
+    <div class="login-sub">Pilih akses dan masuk ke dashboard Anda</div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole('founder')" data-role="founder">👑 Founder</button>
+      <button class="role-tab" onclick="setRole('manajemen')" data-role="manajemen">🏛️ Manajemen</button>
+      <button class="role-tab" onclick="setRole('donatur')" data-role="donatur">💰 Donatur</button>
+      <button class="role-tab" onclick="setRole('relawan')" data-role="relawan">🤝 Relawan</button>
+      <button class="role-tab" onclick="setRole('publik')" data-role="publik">🌐 Publik</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email / Username</label>
+      <input type="text" class="form-input" id="login-user" placeholder="nama@nawacahaya.org">
+    </div>
+    <div class="form-group" id="pw-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="login-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk ke Dashboard</button>
+    <div class="login-hint" id="login-hint">
+      <span style="color:var(--muted)">Username: <strong style="color:var(--goldf)">founder / admin123</strong></span>
+    </div>
+  </div>
+  <div class="setup-strip">
+    <p>🔌 Hubungkan Google Apps Script (opsional — untuk data live)</p>
+    <input type="text" id="gs-url-login" placeholder="https://script.google.com/macros/s/.../exec">
+    <button onclick="saveGSUrl()">Simpan URL</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP SCREEN
+     ═══════════════════════════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+
+<!-- Connection banner -->
+<div class="conn-banner" id="conn-banner">
+  ⚙️ <strong>Google Sheets:</strong>
+  <input type="text" id="gs-url-app" placeholder="Paste URL Apps Script...">
+  <button onclick="connectGS()" style="background:var(--gold);color:var(--deep);padding:.28rem .8rem;border-radius:5px;font-size:.76rem;font-weight:700;border:none;cursor:pointer;">Hubungkan</button>
+  <span id="conn-status" style="opacity:.7;font-size:.74rem;">Belum terhubung</span>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-logo">
+    <span class="sb-logo-icon">🌿</span>
+    <div><span class="nm">Nawa Cahaya</span><span class="tg">DASHBOARD SISTEM</span></div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-user-card">
+      <div class="sb-av" id="sb-av">F</div>
+      <div class="sb-user-info">
+        <div class="un" id="sb-uname">Founder</div>
+        <div class="ur" id="sb-urole">Full Access</div>
+      </div>
+      <div class="sb-conn off" id="sb-conn-dot" title="Status koneksi Sheets"></div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <!-- Nav rendered by JS per role -->
+  </nav>
+  <div class="sb-footer">
+    <button class="btn-logout" onclick="doLogout()">↩ Keluar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-area">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:.8rem;">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="tb-left">
+        <h2 id="tb-title">Dashboard</h2>
+        <p id="tb-date"></p>
+      </div>
+    </div>
+    <div class="tb-right">
+      <button class="tb-btn tb-btn-outline" id="sync-btn" onclick="syncAll()">
+        <span class="sync-icon" id="sync-icon">🔄</span> Sync
+      </button>
+      <div class="tb-badge"><div class="live-dot"></div><span id="last-sync">Belum sync</span></div>
+      <button class="tb-btn tb-btn-gold" id="tb-action-btn" onclick="openModal('m-donasi')">+ Catat Donasi</button>
+    </div>
+  </div>
+
+  <div class="content" id="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div id="p-overview" class="page-section active">
+      <div class="ph">
+        <div class="ph-badge">Dashboard</div>
+        <h1 class="ph-title" id="greeting-title">Selamat Datang 👋</h1>
+        <p class="ph-sub">Data real-time dari Google Sheets. Klik Sync untuk refresh.</p>
+      </div>
+      <div class="trans-ticker">
+        <span class="trans-dot"></span>
+        <span id="ticker-text">🌿 Transparansi 24/7 aktif — semua donasi tercatat dan dapat dicek publik kapanpun</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card sc-green"><div class="stat-label">Anak Binaan</div><div class="stat-val" id="s-anak">0</div><div class="stat-sub">Aktif terdaftar</div></div>
+        <div class="stat-card sc-gold"><div class="stat-label">Dana Terkumpul</div><div class="stat-val" id="s-dana">Rp 0</div><div class="stat-sub">Total donasi masuk</div><span class="stat-badge up" id="s-prog">0%</span></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Saldo Tersedia</div><div class="stat-val" id="s-saldo">Rp 0</div><div class="stat-sub">Setelah pengeluaran</div></div>
+        <div class="stat-card sc-purple"><div class="stat-label">Donatur</div><div class="stat-val" id="s-donatur">0</div><div class="stat-sub">Individu + CSR</div></div>
+        <div class="stat-card sc-red"><div class="stat-label">Relawan</div><div class="stat-val" id="s-relawan">0</div><div class="stat-sub">Aktif terdaftar</div></div>
+      </div>
+      <div class="g7030">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">📈 Donasi Masuk — Progres Fase 1</div></div>
+          <div class="card-body">
+            <div class="prog-wrap">
+              <div class="prog-label"><span>Target Fase 1 — Rp 642 Jt</span><span id="prog-pct">0%</span></div>
+              <div class="prog-bar-bg" style="height:10px"><div class="prog-bar-fill gold" id="prog-bar" style="width:0%"></div></div>
+            </div>
+            <div class="chart-wrap h220" style="margin-top:1rem"><canvas id="chart-monthly"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">⚡ Aktivitas Terbaru</div></div>
+          <div class="card-body" id="activity-feed">
+            <div class="empty"><div class="empty-icon">📋</div>Sync dulu untuk lihat aktivitas.</div>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">👦 Program Anak</div></div>
+          <div class="card-body"><div class="chart-wrap h180"><canvas id="chart-prog"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">🌿 Jalur Market</div></div>
+          <div class="card-body"><div class="chart-wrap h180"><canvas id="chart-market"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ANAK BINAAN ══ -->
+    <div id="p-anak" class="page-section">
+      <div class="ph"><div class="ph-badge">Program</div><h1 class="ph-title">Anak Binaan</h1></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-green"><div class="stat-label">Total Anak</div><div class="stat-val" id="sa-total">0</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Aktif</div><div class="stat-val" id="sa-aktif">0</div></div>
+        <div class="stat-card sc-gold"><div class="stat-label">Avg Nilai</div><div class="stat-val" id="sa-avg">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">📋 Data Anak Binaan</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-anak')">+ Tambah Anak</button>
+        </div>
+        <div class="card-body" id="tbl-anak">
+          <div class="empty"><div class="empty-icon">👦</div>Klik Sync untuk memuat data.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">📊 Progress Perkembangan (Nilai 1–5)</div></div>
+        <div class="card-body"><div class="chart-wrap h260"><canvas id="chart-anak-dev"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ DONASI ══ -->
+    <div id="p-donasi" class="page-section">
+      <div class="ph"><div class="ph-badge">Keuangan</div><h1 class="ph-title">Manajemen Donasi</h1></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-gold"><div class="stat-label">Total</div><div class="stat-val" id="sd-total">Rp 0</div></div>
+        <div class="stat-card sc-green"><div class="stat-label">Jumlah</div><div class="stat-val" id="sd-count">0</div><div class="stat-sub">Transaksi</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Rata-rata</div><div class="stat-val" id="sd-avg">Rp 0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">💰 Riwayat Donasi</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-donasi')">+ Catat</button>
+        </div>
+        <div class="card-body tbl-wrap" id="tbl-donasi">
+          <div class="empty"><div class="empty-icon">💰</div>Klik Sync untuk memuat data.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PENGELUARAN ══ -->
+    <div id="p-pengeluaran" class="page-section">
+      <div class="ph"><div class="ph-badge">Keuangan</div><h1 class="ph-title">Pengeluaran</h1></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-red"><div class="stat-label">Total Keluar</div><div class="stat-val" id="se-total">Rp 0</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Transaksi</div><div class="stat-val" id="se-count">0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">📤 Riwayat Pengeluaran</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-keluar')">+ Catat</button>
+        </div>
+        <div class="card-body tbl-wrap" id="tbl-keluar">
+          <div class="empty"><div class="empty-icon">📤</div>Klik Sync untuk memuat data.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RELAWAN ══ -->
+    <div id="p-relawan" class="page-section">
+      <div class="ph"><div class="ph-badge">Tim</div><h1 class="ph-title">Relawan & Mentor</h1></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-green"><div class="stat-label">Total</div><div class="stat-val" id="sv-total">0</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Pengajar</div><div class="stat-val" id="sv-guru">0</div></div>
+        <div class="stat-card sc-purple"><div class="stat-label">Psikolog</div><div class="stat-val" id="sv-psiko">0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">🤝 Database Relawan</div>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-relawan')">+ Daftar</button>
+        </div>
+        <div class="card-body tbl-wrap" id="tbl-relawan">
+          <div class="empty"><div class="empty-icon">🤝</div>Klik Sync untuk memuat data.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PERTANIAN ══ -->
+    <div id="p-pertanian" class="page-section">
+      <div class="ph"><div class="ph-badge">Produksi</div><h1 class="ph-title">Lahan & Pertanian Organik</h1></div>
+      <div class="alert al-success">🌱 Semua lahan Nawa Cahaya menggunakan sistem <strong>100% ORGANIK</strong> — zero pestisida kimia, pupuk dari kotoran ternak sendiri.</div>
+      <div class="paket-grid">
+        <div class="paket-card"><div class="pk-icon">🫚</div><div class="pk-name">Jahe Merah</div><div class="pk-price">Rp 80.000/kg ekspor</div><div class="pk-desc">15 ton/ha · 8–10 bln · Target: China, Jepang</div><span class="pk-badge badge b-blue">Plan A Ekspor</span></div>
+        <div class="paket-card"><div class="pk-icon">🌼</div><div class="pk-name">Kunyit</div><div class="pk-price">Rp 35.000/kg ekspor</div><div class="pk-desc">15 ton/ha · Curcumin >3.5% · EU, USA</div><span class="pk-badge badge b-blue">Plan A Ekspor</span></div>
+        <div class="paket-card"><div class="pk-icon">🌾</div><div class="pk-name">Sereh Wangi</div><div class="pk-price">Rp 130.000/L minyak</div><div class="pk-desc">Perennial 5 thn · Minyak atsiri premium</div><span class="pk-badge badge b-blue">Plan A Ekspor</span></div>
+        <div class="paket-card"><div class="pk-icon">🍅</div><div class="pk-name">Sayur Resto</div><div class="pk-price">Rp 15.000–80.000/kg</div><div class="pk-desc">12 komoditi · Hotel, resto, dapur yayasan</div><span class="pk-badge badge b-green">Plan B Lokal</span></div>
+        <div class="paket-card"><div class="pk-icon">🐐</div><div class="pk-name">Ternak Kambing</div><div class="pk-price">Kotoran → pupuk gratis</div><div class="pk-desc">2 pasang · Susu + daging · Pupuk organik</div><span class="pk-badge badge b-green">Plan B Lokal</span></div>
+        <div class="paket-card"><div class="pk-icon">🐔</div><div class="pk-name">Ayam Petelur</div><div class="pk-price">15–18 telur/hari</div><div class="pk-desc">20 ekor · Dapur yayasan terpenuhi</div><span class="pk-badge badge b-green">Plan B Lokal</span></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">📒 Logbook Kebun (Terbaru)</div></div>
+          <div class="card-body" id="tbl-logbook"><div class="empty"><div class="empty-icon">🌿</div>Isi logbook di Google Sheets.</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">💰 Estimasi Pendapatan (Proyeksi)</div></div>
+          <div class="card-body"><div class="chart-wrap h220"><canvas id="chart-panen"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TRANSPARANSI (PUBLIK) ══ -->
+    <div id="p-transparansi" class="page-section">
+      <div class="ph"><div class="ph-badge">Publik</div><h1 class="ph-title">Laporan Transparansi</h1><p class="ph-sub">Data ini terbuka untuk semua pihak — 24 jam, tanpa login.</p></div>
+      <div class="stat-grid">
+        <div class="stat-card sc-gold"><div class="stat-label">Dana Masuk</div><div class="stat-val" id="pt-masuk">Rp 0</div></div>
+        <div class="stat-card sc-red"><div class="stat-label">Dana Keluar</div><div class="stat-val" id="pt-keluar">Rp 0</div></div>
+        <div class="stat-card sc-green"><div class="stat-label">Saldo</div><div class="stat-val" id="pt-saldo">Rp 0</div></div>
+        <div class="stat-card sc-blue"><div class="stat-label">Donatur</div><div class="stat-val" id="pt-donatur">0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">📊 Progres Target Fase 1 (Rp 642 Jt)</div></div>
+        <div class="card-body">
+          <div class="prog-wrap">
+            <div class="prog-label"><span>🎯 Target Fase 1</span><span id="pt-pct">0%</span></div>
+            <div class="prog-bar-bg" style="height:12px"><div class="prog-bar-fill gold" id="pt-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">💰 Riwayat Donasi (Publik)</div></div>
+        <div class="card-body tbl-wrap" id="tbl-pub-donasi"><div class="empty"><div class="empty-icon">📊</div>Klik Sync untuk memuat.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ PAKET INVESTASI ══ -->
+    <div id="p-paket" class="page-section">
+      <div class="ph"><div class="ph-badge">Investasi</div><h1 class="ph-title">Paket Donasi Investasi</h1><p class="ph-sub">Pilih paket kontribusi yang sesuai. Semua hasil dilaporkan transparan.</p></div>
+      <div class="alert al-info">💡 Sistem bagi hasil: <strong>Yayasan 40%</strong> · <strong>Donatur 10%</strong> · <strong>Tenaga Lokal 40%</strong> · <strong>Anak Binaan 3%</strong> · <strong>Manajemen 7%</strong> — setelah kebutuhan dapur yayasan terpenuhi.</div>
+      <div class="paket-grid" id="paket-list"></div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">🌏 Peluang Ekspansi Internasional</div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem">
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:1rem">
+              <div style="font-size:.78rem;font-weight:700;color:var(--goldf);margin-bottom:.3rem">USAID Youth Fund</div>
+              <div style="font-size:.75rem;color:var(--muted)">USD 50k–200k · USA · Education & Youth</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:1rem">
+              <div style="font-size:.78rem;font-weight:700;color:var(--goldf);margin-bottom:.3rem">UNICEF Innovation</div>
+              <div style="font-size:.75rem;color:var(--muted)">USD 50k–100k · Global · Child Welfare + Tech</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:1rem">
+              <div style="font-size:.78rem;font-weight:700;color:var(--goldf);margin-bottom:.3rem">Google.org Impact</div>
+              <div style="font-size:.75rem;color:var(--muted)">USD 100k–5M · Global · Tech for Social Good</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:1rem">
+              <div style="font-size:.78rem;font-weight:700;color:var(--goldf);margin-bottom:.3rem">Diaspora Network</div>
+              <div style="font-size:.75rem;color:var(--muted)">Varied · Indonesia Global · Always Open</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PORTAL DONATUR ══ -->
+    <div id="p-portal" class="page-section">
+      <div class="ph"><div class="ph-badge">Portal</div><h1 class="ph-title">Portal Donatur</h1><p class="ph-sub">Pantau investasi dan dampak nyata donasi Anda.</p></div>
+      <div class="roi-card">
+        <h3>💰 Ringkasan Investasi Anda</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1rem">
+          <div><div class="roi-number" id="d-total">Rp 0</div><div class="roi-label">Total Donasi</div></div>
+          <div><div class="roi-number" id="d-roi">0%</div><div class="roi-label">Est. ROI (bagi hasil)</div></div>
+          <div><div class="roi-number" id="d-return">Rp 0</div><div class="roi-label">Est. Return Panen</div></div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">🌿 Lahan yang Disponsori</div></div>
+          <div class="card-body" id="d-lahan">
+            <div class="empty"><div class="empty-icon">🌱</div>Belum ada lahan terdaftar.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">👦 Anak yang Didukung</div></div>
+          <div class="card-body" id="d-anak-support">
+            <div class="empty"><div class="empty-icon">👦</div>Belum ada anak terdaftar.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title">📜 Riwayat Donasi Anda</div></div>
+        <div class="card-body tbl-wrap" id="tbl-d-history">
+          <div class="empty"><div class="empty-icon">📋</div>Klik Sync untuk memuat riwayat.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PENGATURAN ══ -->
+    <div id="p-setting" class="page-section">
+      <div class="ph"><div class="ph-badge">Sistem</div><h1 class="ph-title">Pengaturan & Keamanan</h1></div>
+
+      <!-- UBAH PASSWORD — semua role bisa ubah password sendiri -->
+      <div class="card" style="margin-bottom:1.2rem">
+        <div class="card-head">
+          <div class="card-head-title">🔑 Ubah Password Akun Saya</div>
+          <span style="font-size:.72rem;color:var(--light);background:rgba(82,183,136,.1);padding:.2rem .6rem;border-radius:20px">Semua role bisa ubah password sendiri</span>
+        </div>
+        <div class="card-body-pad">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-bottom:.8rem">
+            <div class="form-group-sm"><label class="fl">Password Lama</label><input type="password" class="fi" id="pw-old" placeholder="Password saat ini"></div>
+            <div class="form-group-sm"><label class="fl">Password Baru</label><input type="password" class="fi" id="pw-new" placeholder="Min. 8 karakter"></div>
+            <div class="form-group-sm"><label class="fl">Konfirmasi</label><input type="password" class="fi" id="pw-confirm" placeholder="Ulangi password baru"></div>
+          </div>
+          <button class="btn btn-gold" onclick="changeMyPassword()">🔑 Simpan Password Baru</button>
+          <div id="pw-status" style="margin-top:.6rem;font-size:.78rem"></div>
+        </div>
+      </div>
+
+      <!-- MANAJEMEN USER — hanya founder & manajemen -->
+      <div class="card" style="margin-bottom:1.2rem" id="card-user-mgmt">
+        <div class="card-head">
+          <div class="card-head-title">👥 Manajemen Akun User</div>
+          <span style="font-size:.72rem;color:var(--goldf);background:rgba(212,160,23,.1);padding:.2rem .6rem;border-radius:20px">🔒 Founder & Manajemen only</span>
+        </div>
+        <div class="card-body-pad" id="user-mgmt-body">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <!-- KONEKSI GOOGLE SHEETS — hanya founder & manajemen -->
+      <div class="card" style="margin-bottom:1.2rem" id="card-gs-conn">
+        <div class="card-head">
+          <div class="card-head-title">🔌 Koneksi Google Apps Script</div>
+          <span style="font-size:.72rem;color:var(--goldf);background:rgba(212,160,23,.1);padding:.2rem .6rem;border-radius:20px">🔒 Founder & Manajemen only</span>
+        </div>
+        <div class="card-body-pad">
+          <div class="form-group-sm"><label class="fl">URL Google Apps Script (Web App)</label>
+            <input type="text" class="fi" id="set-gs-url" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <div class="btn-gap">
+            <button class="btn btn-primary" onclick="connectFromSettings()">🔌 Hubungkan & Test</button>
+            <button class="btn btn-outline" onclick="testConn()">🔍 Test Saja</button>
+            <button class="btn btn-danger" onclick="disconnect()">✕ Putus</button>
+          </div>
+          <div id="set-conn-status" style="margin-top:.8rem;font-size:.77rem;color:var(--muted)">Status: Belum terhubung</div>
+        </div>
+      </div>
+
+      <!-- PANDUAN SETUP APPS SCRIPT -->
+      <div class="card" id="card-gs-guide">
+        <div class="card-head"><div class="card-head-title">📋 Panduan Setup Google Sheets + Apps Script (5 Langkah)</div></div>
+        <div class="card-body-pad">
+          <div style="display:flex;flex-direction:column;gap:.9rem">
+            <div style="display:flex;gap:.9rem;align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">1</div>
+              <div><div style="font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Buka Google Sheets baru</div><div style="font-size:.78rem;color:var(--muted)">Pergi ke <code style="background:var(--bg);padding:1px 5px;border-radius:4px;color:var(--mint)">sheets.google.com</code> → buat spreadsheet baru → beri nama "Nawa Cahaya Data"</div></div>
+            </div>
+            <div style="display:flex;gap:.9rem;align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">2</div>
+              <div><div style="font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Buka Apps Script</div><div style="font-size:.78rem;color:var(--muted)">Di Google Sheets → klik <strong style="color:var(--text)">Extensions → Apps Script</strong> → tab baru terbuka</div></div>
+            </div>
+            <div style="display:flex;gap:.9rem;align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">3</div>
+              <div><div style="font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Paste Code.gs</div><div style="font-size:.78rem;color:var(--muted)">Hapus semua kode default → paste isi file <code style="background:var(--bg);padding:1px 5px;border-radius:4px;color:var(--mint)">Code.gs</code> yang sudah didownload → <strong style="color:var(--text)">Ctrl+S (Save)</strong></div></div>
+            </div>
+            <div style="display:flex;gap:.9rem;align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">4</div>
+              <div><div style="font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Deploy sebagai Web App</div><div style="font-size:.78rem;color:var(--muted)">Klik <strong style="color:var(--text)">Deploy → New Deployment → Web App</strong> → Execute as: <strong style="color:var(--goldf)">Me</strong> → Who has access: <strong style="color:var(--goldf)">Anyone</strong> → klik <strong style="color:var(--text)">Deploy</strong></div></div>
+            </div>
+            <div style="display:flex;gap:.9rem;align-items:flex-start">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--light);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0">5</div>
+              <div><div style="font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Copy URL → Paste di atas → Klik Hubungkan</div><div style="font-size:.78rem;color:var(--muted)">Copy URL deployment yang muncul (format: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;color:var(--mint)">https://script.google.com/macros/s/xxx/exec</code>) → paste di field di atas → klik <strong style="color:var(--goldf)">Hubungkan & Test</strong> → banner hijau = berhasil! ✅</div></div>
+            </div>
+          </div>
+          <div style="margin-top:1rem;background:rgba(82,183,136,.07);border:1px solid rgba(82,183,136,.2);border-radius:9px;padding:.85rem;font-size:.78rem;color:var(--mint)">
+            💡 Setelah terhubung → klik <strong>Sync</strong> di topbar → data dari Google Sheets langsung masuk dashboard. Setiap isi form publik juga langsung masuk ke Sheets.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main-area -->
+</div><!-- /screen-app -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     PUBLIC FORM SCREEN
+     ═══════════════════════════════════════════════════════════ -->
+<div id="screen-publik" class="screen" style="background:#F5F7F5">
+  <div class="pub-hero">
+    <h1>Satu Cahaya,<br><em>Seribu Harapan</em></h1>
+    <p>Bergabunglah membentuk masa depan anak-anak yang membutuhkan kesempatan.</p>
+    <div class="pub-stats">
+      <div class="pub-stat"><span class="pv" id="pub-anak">—</span><span class="pl">Anak Binaan</span></div>
+      <div class="pub-stat"><span class="pv" id="pub-donatur">—</span><span class="pl">Donatur</span></div>
+      <div class="pub-stat"><span class="pv" id="pub-prog">—</span><span class="pl">Target Fase 1</span></div>
+    </div>
+  </div>
+  <div class="pub-tabs-wrap">
+    <div class="pub-tabs">
+      <button class="pub-tab active" onclick="pubTab('donasi')">💰 Donasi</button>
+      <button class="pub-tab" onclick="pubTab('relawan')">🤝 Jadi Relawan</button>
+      <button class="pub-tab" onclick="pubTab('csr')">🏢 Kemitraan CSR</button>
+    </div>
+  </div>
+  <div class="pub-panels">
+    <!-- DONASI FORM -->
+    <div class="pub-panel active" id="pub-donasi">
+      <div class="pub-form-card">
+        <div class="pfc-head"><h2>💚 Kirim Donasi Investasi</h2><p>Setiap rupiah membuka pintu masa depan seorang anak</p></div>
+        <div class="pfc-body" id="pub-donasi-body">
+          <div class="form-group-sm">
+            <label class="fl">Pilih nominal <span class="req">*</span></label>
+            <div class="amount-grid">
+              <button class="amount-btn" onclick="pickAmt(500000,this)"><span class="an">Rp 500rb</span><span class="ad">Makan 1 anak/bln</span></button>
+              <button class="amount-btn" onclick="pickAmt(1000000,this)"><span class="an">Rp 1 Jt</span><span class="ad">ATK & buku</span></button>
+              <button class="amount-btn" onclick="pickAmt(2000000,this)"><span class="an">Rp 2 Jt</span><span class="ad">Pendidikan/bln</span></button>
+              <button class="amount-btn" onclick="pickAmt(5000000,this)"><span class="an">Rp 5 Jt</span><span class="ad">Paket Kasih</span></button>
+              <button class="amount-btn" onclick="pickAmt(20000000,this)"><span class="an">Rp 20 Jt</span><span class="ad">Paket Skill</span></button>
+              <button class="amount-btn" onclick="pickAmt(0,this)"><span class="an">Bebas</span><span class="ad">Nominal lain</span></button>
+            </div>
+            <input type="number" class="fi" id="pub-amt" placeholder="Atau ketik nominal (Rp)" min="10000" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22">
+          </div>
+          <div class="form-row">
+            <div class="form-group-sm"><label class="fl">Nama <span class="req">*</span></label><input type="text" class="fi" id="pub-dn" placeholder="Nama kamu / perusahaan" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+            <div class="form-group-sm"><label class="fl">WhatsApp</label><input type="tel" class="fi" id="pub-dp" placeholder="08xxx" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+          </div>
+          <div class="form-group-sm"><label class="fl">Kategori</label>
+            <select class="fi" id="pub-dcat" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22">
+              <option>Umum / Bebas</option>
+              <option>Bangunan & Infrastruktur</option>
+              <option>Pilar Kasih — Pendidikan</option>
+              <option>Pilar Membentuk — Pertanian</option>
+              <option>Pilar Menjaga — Skill</option>
+              <option>Operasional Bulanan</option>
+            </select>
+          </div>
+          <div class="form-group-sm"><label class="fl">Pesan / Doa</label><textarea class="fi" id="pub-dnote" placeholder="Tuliskan pesan untuk anak-anak Nawa Cahaya..." rows="3" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></textarea></div>
+          <div style="background:rgba(82,183,136,.06);border:1px solid rgba(82,183,136,.15);border-radius:8px;padding:.9rem;font-size:.79rem;color:#3a6650;margin-bottom:.5rem">
+            📋 <strong>Rekening:</strong> BCA 1234-5678-90 a/n Yayasan Nawa Cahaya<br>
+            💬 Konfirmasi ke WhatsApp setelah transfer. Laporan bulanan dikirim ke donatur.
+          </div>
+          <button class="btn-submit-pub gold-btn" onclick="submitPubDonasi()">💛 Kirim Komitmen Donasi</button>
+        </div>
+        <div class="success-box" id="pub-donasi-ok"><div class="si">🙏</div><h3>Terima Kasih!</h3><p>Komitmen donasi Anda sudah kami catat. Tim Nawa Cahaya akan menghubungi untuk konfirmasi transfer.</p><button onclick="resetPubForm('donasi')" style="margin-top:1rem;padding:.55rem 1.5rem;border:1.5px solid var(--mid);border-radius:8px;color:var(--mid);cursor:pointer;font-weight:600">← Kembali</button></div>
+      </div>
+    </div>
+    <!-- RELAWAN FORM -->
+    <div class="pub-panel" id="pub-relawan">
+      <div class="pub-form-card">
+        <div class="pfc-head"><h2>🌟 Daftar Jadi Relawan / Mentor</h2><p>Bagikan waktu dan keahlianmu untuk generasi penerus</p></div>
+        <div class="pfc-body" id="pub-relawan-body">
+          <div class="form-row">
+            <div class="form-group-sm"><label class="fl">Nama <span class="req">*</span></label><input type="text" class="fi" id="pub-rn" placeholder="Nama lengkap" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+            <div class="form-group-sm"><label class="fl">WhatsApp <span class="req">*</span></label><input type="tel" class="fi" id="pub-rp" placeholder="08xxx" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group-sm"><label class="fl">Email</label><input type="email" class="fi" id="pub-re" placeholder="email@kamu.com" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+            <div class="form-group-sm"><label class="fl">Instagram</label><input type="text" class="fi" id="pub-rig" placeholder="@username" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group-sm"><label class="fl">Bidang Keahlian <span class="req">*</span></label>
+              <select class="fi" id="pub-rsk" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22">
+                <option value="">— Pilih bidang —</option>
+                <option>Pengajar / Tutor Paket C</option>
+                <option>Psikolog / Konselor Anak</option>
+                <option>Instruktur Pertanian Organik</option>
+                <option>IT / Digital Skills</option>
+                <option>Skill Kreatif & Jahit</option>
+                <option>Mentor Bisnis / Junior CEO</option>
+                <option>Fotografi / Konten Media</option>
+                <option>Relawan Umum</option>
+                <option>Lainnya</option>
+              </select>
+            </div>
+            <div class="form-group-sm"><label class="fl">Instansi</label><input type="text" class="fi" id="pub-rorg" placeholder="Universitas / Perusahaan" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+          </div>
+          <div class="form-group-sm"><label class="fl">Motivasi bergabung</label><textarea class="fi" id="pub-rmot" rows="3" placeholder="Ceritakan kenapa kamu mau bergabung..." style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></textarea></div>
+          <button class="btn-submit-pub" onclick="submitPubRelawan()">🌿 Daftar Sekarang</button>
+        </div>
+        <div class="success-box" id="pub-relawan-ok"><div class="si">🎉</div><h3>Selamat Bergabung!</h3><p>Data kamu sudah kami terima. Tim akan menghubungi dalam 1–3 hari kerja untuk briefing awal.</p><button onclick="resetPubForm('relawan')" style="margin-top:1rem;padding:.55rem 1.5rem;border:1.5px solid var(--mid);border-radius:8px;color:var(--mid);cursor:pointer;font-weight:600">← Kembali</button></div>
+      </div>
+    </div>
+    <!-- CSR FORM -->
+    <div class="pub-panel" id="pub-csr">
+      <div class="pub-form-card">
+        <div class="pfc-head"><h2>🏢 Kemitraan CSR</h2><p>Jadikan CSR perusahaan Anda berdampak nyata dan terukur</p></div>
+        <div class="pfc-body" id="pub-csr-body">
+          <div class="form-row">
+            <div class="form-group-sm"><label class="fl">Perusahaan <span class="req">*</span></label><input type="text" class="fi" id="pub-cn" placeholder="PT. Nama Perusahaan" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+            <div class="form-group-sm"><label class="fl">Tipe Kemitraan</label>
+              <select class="fi" id="pub-ct" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22">
+                <option>CSR Perusahaan</option>
+                <option>Grant / Hibah</option>
+                <option>Impact Investor</option>
+                <option>Donasi Karyawan Kolektif</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group-sm"><label class="fl">Nama PIC <span class="req">*</span></label><input type="text" class="fi" id="pub-cpic" placeholder="Nama PIC" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+            <div class="form-group-sm"><label class="fl">Email PIC <span class="req">*</span></label><input type="email" class="fi" id="pub-cemail" placeholder="pic@company.com" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></div>
+          </div>
+          <div class="form-group-sm"><label class="fl">Estimasi Kontribusi/Tahun</label>
+            <select class="fi" id="pub-cbudget" style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22">
+              <option>Di bawah Rp 50 juta</option>
+              <option>Rp 50–100 juta</option>
+              <option>Rp 100–250 juta</option>
+              <option>Di atas Rp 250 juta</option>
+            </select>
+          </div>
+          <div class="form-group-sm"><label class="fl">Pesan</label><textarea class="fi" id="pub-cnote" rows="3" placeholder="Sampaikan kebutuhan spesifik..." style="background:#fff;border:1.5px solid #D0E4D8;color:#1a2e22"></textarea></div>
+          <button class="btn-submit-pub gold-btn" onclick="submitPubCSR()">🤝 Kirim Proposal</button>
+        </div>
+        <div class="success-box" id="pub-csr-ok"><div class="si">🏆</div><h3>Proposal Diterima!</h3><p>Tim Nawa Cahaya akan menghubungi Anda dalam 2–3 hari kerja.</p><button onclick="resetPubForm('csr')" style="margin-top:1rem;padding:.55rem 1.5rem;border:1.5px solid var(--mid);border-radius:8px;color:var(--mid);cursor:pointer;font-weight:600">← Kembali</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="pub-footer"><strong>Yayasan Nawa Cahaya</strong> · Bogor, Jawa Barat · Transparansi 24/7</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+     ═══════════════════════════════════════════════════════════ -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <!-- Donasi -->
+  <div class="modal-box" id="m-donasi" onclick="e=>e.stopPropagation()">
+    <div class="modal-head"><h3>💰 Catat Donasi</h3><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Nama Donatur <span class="req">*</span></label><input class="fi" id="m-dn" placeholder="Nama lengkap"></div><div class="form-group-sm"><label class="fl">Jumlah (Rp) <span class="req">*</span></label><input type="number" class="fi" id="m-da" placeholder="10000000"></div></div>
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Kategori</label><select class="fi" id="m-dc"><option>Umum</option><option>Bangunan</option><option>Pendidikan</option><option>Pertanian</option><option>Operasional</option></select></div><div class="form-group-sm"><label class="fl">Metode</label><select class="fi" id="m-dm"><option>Transfer Bank</option><option>QRIS</option><option>Tunai</option><option>OVO/GoPay</option></select></div></div>
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Tanggal</label><input type="date" class="fi" id="m-dd"></div><div class="form-group-sm"><label class="fl">Catatan</label><input class="fi" id="m-dno" placeholder="Opsional"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="submitDonasi()">💾 Simpan</button><button class="btn btn-outline" onclick="closeModal()">Batal</button></div>
+  </div>
+  <!-- Anak -->
+  <div class="modal-box" id="m-anak" onclick="e=>e.stopPropagation()" style="display:none">
+    <div class="modal-head"><h3>👦 Tambah Anak Binaan</h3><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Nama <span class="req">*</span></label><input class="fi" id="m-an" placeholder="Nama / inisial"></div><div class="form-group-sm"><label class="fl">Usia</label><input type="number" class="fi" id="m-aa" placeholder="15"></div></div>
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Program</label><select class="fi" id="m-ap"><option>Pendidikan Dasar</option><option>Paket C Setara SMA</option><option>Skill Kreatif</option><option>Skill Digital</option><option>Pertanian Organik</option></select></div><div class="form-group-sm"><label class="fl">Tgl Bergabung</label><input type="date" class="fi" id="m-atgl"></div></div>
+      <div class="form-group-sm"><label class="fl">Catatan Khusus</label><input class="fi" id="m-ano" placeholder="Kondisi, asal (opsional)"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="submitAnak()">💾 Simpan</button><button class="btn btn-outline" onclick="closeModal()">Batal</button></div>
+  </div>
+  <!-- Keluar -->
+  <div class="modal-box" id="m-keluar" onclick="e=>e.stopPropagation()" style="display:none">
+    <div class="modal-head"><h3>📤 Catat Pengeluaran</h3><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Kategori</label><select class="fi" id="m-kc"><option>Bangunan</option><option>Pendidikan</option><option>Pertanian</option><option>Operasional Harian</option><option>Gaji & Honor</option><option>Legalitas</option></select></div><div class="form-group-sm"><label class="fl">Jumlah <span class="req">*</span></label><input type="number" class="fi" id="m-ka" placeholder="5000000"></div></div>
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Tanggal</label><input type="date" class="fi" id="m-kd"></div><div class="form-group-sm"><label class="fl">Keterangan <span class="req">*</span></label><input class="fi" id="m-kno" placeholder="Detail penggunaan"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="submitKeluar()">💾 Simpan</button><button class="btn btn-outline" onclick="closeModal()">Batal</button></div>
+  </div>
+  <!-- Relawan -->
+  <div class="modal-box" id="m-relawan" onclick="e=>e.stopPropagation()" style="display:none">
+    <div class="modal-head"><h3>🤝 Daftar Relawan</h3><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Nama <span class="req">*</span></label><input class="fi" id="m-rn" placeholder="Nama lengkap"></div><div class="form-group-sm"><label class="fl">WhatsApp</label><input class="fi" id="m-rp" placeholder="08xxx"></div></div>
+      <div class="form-row"><div class="form-group-sm"><label class="fl">Bidang</label><select class="fi" id="m-rsk"><option>Pengajar</option><option>Psikolog</option><option>Pertanian</option><option>IT</option><option>Kreatif</option><option>Lainnya</option></select></div><div class="form-group-sm"><label class="fl">Instansi</label><input class="fi" id="m-rorg" placeholder="Universitas / Perusahaan"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-gold" onclick="submitRelawan()">💾 Simpan</button><button class="btn btn-outline" onclick="closeModal()">Batal</button></div>
+  </div>
+  <!-- Confirm delete -->
+  <div class="modal-box" id="m-confirm" onclick="e=>e.stopPropagation()" style="display:none;max-width:360px">
+    <div class="modal-head"><h3>⚠️ Konfirmasi</h3><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="modal-body"><p id="confirm-msg" style="font-size:.88rem;color:var(--muted)">Yakin hapus data ini?</p></div>
+    <div class="modal-footer"><button class="btn btn-danger" id="confirm-yes">Ya, Hapus</button><button class="btn btn-outline" onclick="closeModal()">Batal</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE & CONFIG
+// ═══════════════════════════════════════════════════════════
+let GS_URL = localStorage.getItem('nc_gs_url') || '';
+let CONNECTED = false;
+let CURRENT_ROLE = 'admin';
+let CURRENT_USER = { name: 'Founder', email: 'admin@nawacahaya.org', role: 'admin' };
+const TARGET = 642360000;
+
+// In-memory data cache
+let CACHE = {
+  summary: null,
+  Donasi: [], Anak: [], Donatur: [], Relawan: [], Pengeluaran: []
+};
+
+// Demo data (used when not connected)
+const DEMO = {
+  summary: {
+    totalDonasi: 87500000, jumlahDonasi: 12, totalAnak: 7, anakAktif: 7,
+    totalDonatur: 9, csrAktif: 2, totalRelawan: 11, totalKeluar: 24500000,
+    saldo: 63000000, target: TARGET, progress: 14, lastUpdated: new Date().toISOString()
+  },
+  Donasi: [
+    { ID:'DON-0001', Tanggal:'2025-01-15', 'Nama Donatur':'PT Cahaya Nusantara', Jumlah:25000000, Kategori:'Bangunan & Infrastruktur', Metode:'Transfer Bank', Catatan:'Untuk pembangunan ruang kelas' },
+    { ID:'DON-0002', Tanggal:'2025-02-03', 'Nama Donatur':'Budi Santoso', Jumlah:5000000, Kategori:'Pilar Kasih — Pendidikan', Metode:'QRIS', Catatan:'Semoga bermanfaat' },
+    { ID:'DON-0003', Tanggal:'2025-02-18', 'Nama Donatur':'CV Mitra Sejahtera', Jumlah:15000000, Kategori:'Pilar Membentuk — Pertanian', Metode:'Transfer Bank', Catatan:'' },
+    { ID:'DON-0004', Tanggal:'2025-03-01', 'Nama Donatur':'Rina Wahyuni', Jumlah:2500000, Kategori:'Umum', Metode:'GoPay', Catatan:'Untuk anak-anak yayasan' },
+    { ID:'DON-0005', Tanggal:'2025-03-12', 'Nama Donatur':'Impact Fund Asia', Jumlah:40000000, Kategori:'Operasional Bulanan', Metode:'Transfer Bank', Catatan:'Grant Fase 1' },
+  ],
+  Anak: [
+    { ID:'NC-001', Nama:'Andi R.', Usia:14, Program:'Paket C Setara SMA', 'Tanggal Bergabung':'2025-01-10', Status:'Aktif', Catatan:'' },
+    { ID:'NC-002', Nama:'Sari M.', Usia:13, Program:'Pendidikan Dasar', 'Tanggal Bergabung':'2025-01-10', Status:'Aktif', Catatan:'' },
+    { ID:'NC-003', Nama:'Dani P.', Usia:15, Program:'Skill Digital', 'Tanggal Bergabung':'2025-01-15', Status:'Aktif', Catatan:'' },
+    { ID:'NC-004', Nama:'Lia K.', Usia:12, Program:'Pertanian Organik', 'Tanggal Bergabung':'2025-02-01', Status:'Aktif', Catatan:'' },
+    { ID:'NC-005', Nama:'Rio S.', Usia:16, Program:'Paket C Setara SMA', 'Tanggal Bergabung':'2025-02-05', Status:'Aktif', Catatan:'' },
+    { ID:'NC-006', Nama:'Maya T.', Usia:13, Program:'Skill Kreatif', 'Tanggal Bergabung':'2025-02-10', Status:'Aktif', Catatan:'' },
+    { ID:'NC-007', Nama:'Bima H.', Usia:14, Program:'Pendidikan Dasar', 'Tanggal Bergabung':'2025-03-01', Status:'Aktif', Catatan:'' },
+  ],
+  Relawan: [
+    { ID:'REL-001', Nama:'Ibu Sarah', 'Bidang Keahlian':'Pengajar / Tutor Paket C', Instansi:'Universitas Bogor', Kontak:'081234', Status:'Aktif' },
+    { ID:'REL-002', Nama:'Pak Dimas', 'Bidang Keahlian':'Psikolog / Konselor Anak', Instansi:'RS Salak', Kontak:'082345', Status:'Aktif' },
+    { ID:'REL-003', Nama:'Kak Fira', 'Bidang Keahlian':'IT / Digital Skills', Instansi:'Startup Bogor', Kontak:'083456', Status:'Aktif' },
+    { ID:'REL-004', Nama:'Pak Sunu', 'Bidang Keahlian':'Instruktur Pertanian Organik', Instansi:'Dinas Pertanian', Kontak:'084567', Status:'Aktif' },
+  ],
+  Pengeluaran: [
+    { ID:'OUT-001', Tanggal:'2025-01-20', Kategori:'Bangunan', Keterangan:'Material bambu & atap spandek', Jumlah:8500000 },
+    { ID:'OUT-002', Tanggal:'2025-02-01', Kategori:'Pendidikan', Keterangan:'5 laptop refurb', Jumlah:9000000 },
+    { ID:'OUT-003', Tanggal:'2025-02-15', Kategori:'Operasional Harian', Keterangan:'Biaya makan anak bulan Feb', Jumlah:5000000 },
+    { ID:'OUT-004', Tanggal:'2025-03-01', Kategori:'Pertanian', Keterangan:'Bibit sereh + jahe merah', Jumlah:2000000 },
+  ]
+};
+
+// ── ROLE DEFINITIONS ────────────────────────────────────────
+const ROLES = {
+  founder: {
+    label: '👑 Founder', icon: '👑', av: 'F', color: '#F9C74F',
+    desc: 'Akses penuh mutlak — tambah data, hapus, ubah password, pengaturan sistem.',
+    nav: [
+      { sec: 'Utama' },
+      { id: 'p-overview', icon: '📊', label: 'Dashboard' },
+      { id: 'p-transparansi', icon: '🔍', label: 'Transparansi Publik' },
+      { sec: 'Program' },
+      { id: 'p-anak', icon: '👦', label: 'Anak Binaan', badgeKey: 'totalAnak' },
+      { id: 'p-donasi', icon: '💰', label: 'Donasi', badgeKey: 'jumlahDonasi' },
+      { id: 'p-pengeluaran', icon: '📤', label: 'Pengeluaran' },
+      { id: 'p-relawan', icon: '🤝', label: 'Relawan & Mentor', badgeKey: 'totalRelawan' },
+      { id: 'p-pertanian', icon: '🌿', label: 'Lahan & Pertanian' },
+      { sec: 'Strategi' },
+      { id: 'p-paket', icon: '💎', label: 'Paket Investasi' },
+      { id: 'p-setting', icon: '⚙️', label: 'Pengaturan & Akun' },
+    ],
+    actionBtn: { label: '+ Catat Donasi', modal: 'm-donasi' }
+  },
+  manajemen: {
+    label: '🏛️ Manajemen', icon: '🏛️', av: 'M', color: '#95D5B2',
+    desc: 'Bisa tambah & edit data program. Bisa ubah password. Tidak bisa hapus akun founder.',
+    nav: [
+      { sec: 'Utama' },
+      { id: 'p-overview', icon: '📊', label: 'Dashboard' },
+      { id: 'p-transparansi', icon: '🔍', label: 'Transparansi' },
+      { sec: 'Program' },
+      { id: 'p-anak', icon: '👦', label: 'Anak Binaan', badgeKey: 'totalAnak' },
+      { id: 'p-donasi', icon: '💰', label: 'Donasi' },
+      { id: 'p-pengeluaran', icon: '📤', label: 'Pengeluaran' },
+      { id: 'p-relawan', icon: '🤝', label: 'Relawan & Mentor' },
+      { id: 'p-pertanian', icon: '🌿', label: 'Lahan & Pertanian' },
+      { id: 'p-setting', icon: '⚙️', label: 'Pengaturan & Akun' },
+    ],
+    actionBtn: { label: '+ Catat Donasi', modal: 'm-donasi' }
+  },
+  donatur: {
+    label: '💰 Donatur', icon: '💰', av: 'D', color: '#F9C74F',
+    desc: 'VIEW ONLY — Lihat dashboard, transparansi & progress. Tidak bisa tambah/edit data.',
+    nav: [
+      { sec: 'Portal Saya' },
+      { id: 'p-portal', icon: '💰', label: 'Dashboard Saya' },
+      { id: 'p-transparansi', icon: '🔍', label: 'Transparansi Dana' },
+      { id: 'p-anak', icon: '👦', label: 'Anak Binaan' },
+      { id: 'p-pertanian', icon: '🌿', label: 'Lahan & Paket' },
+      { id: 'p-paket', icon: '💎', label: 'Paket Investasi' },
+    ],
+    actionBtn: null
+  },
+  relawan: {
+    label: '🤝 Relawan', icon: '🤝', av: 'R', color: '#95D5B2',
+    desc: 'VIEW ONLY — Lihat data anak, jadwal program & laporan. Tidak bisa edit.',
+    nav: [
+      { sec: 'Akses Saya' },
+      { id: 'p-overview', icon: '📊', label: 'Ringkasan' },
+      { id: 'p-anak', icon: '👦', label: 'Anak Binaan' },
+      { id: 'p-pertanian', icon: '🌿', label: 'Lahan & Program' },
+      { id: 'p-transparansi', icon: '🔍', label: 'Transparansi' },
+    ],
+    actionBtn: null
+  },
+  publik: {
+    label: '🌐 Publik', icon: '🌐', av: 'P', color: '#6B8F78',
+    desc: 'View publik — form donasi & relawan saja.',
+    nav: [],
+    actionBtn: null
+  }
+};
+
+// ── PERMISSION MATRIX ────────────────────────────────────────
+// canWrite: bisa tambah/edit/hapus data
+// canSettings: bisa ubah password & pengaturan sistem
+// canViewAll: bisa lihat semua data termasuk keuangan
+// canViewOwn: hanya bisa lihat data miliknya sendiri
+const PERMISSIONS = {
+  founder:    { canWrite: true,  canSettings: true,  canViewAll: true,  canViewOwn: true  },
+  manajemen:  { canWrite: true,  canSettings: true,  canViewAll: true,  canViewOwn: true  },
+  donatur:    { canWrite: false, canSettings: false, canViewAll: false, canViewOwn: true  },
+  relawan:    { canWrite: false, canSettings: false, canViewAll: false, canViewOwn: true  },
+  publik:     { canWrite: false, canSettings: false, canViewAll: false, canViewOwn: false },
+};
+
+function canDo(action) {
+  const p = PERMISSIONS[CURRENT_ROLE] || PERMISSIONS.publik;
+  return p[action] === true;
+}
+
+// ── USER DATABASE ─────────────────────────────────────────────
+// Password disimpan di localStorage setelah setup pertama
+// Default: admin123 → WAJIB diganti setelah pertama login
+function getUsers() {
+  const stored = localStorage.getItem('nc_users');
+  if (stored) return JSON.parse(stored);
+  // Default users — founder WAJIB ganti password
+  return {
+    'founder':   { pw: 'admin123',    role: 'founder',   name: 'Founder',   email: 'nawacahaya.foundation@gmail.com', mustChangePw: true },
+    'manajemen': { pw: 'mgt2025',     role: 'manajemen', name: 'Manajemen', email: 'mgt@nawacahaya.org', mustChangePw: true },
+    'donatur':   { pw: 'donor123',    role: 'donatur',   name: 'Donatur',   email: 'donor@example.com', mustChangePw: false },
+    'relawan':   { pw: 'relawan123',  role: 'relawan',   name: 'Relawan',   email: 'relawan@example.com', mustChangePw: false },
+  };
+}
+function saveUsers(u) { localStorage.setItem('nc_users', JSON.stringify(u)); }
+// Users loaded via getUsers() on demand
+
+// ── UTILS ───────────────────────────────────────────────────
+const fmtRp = n => {
+  if (!n || isNaN(n)) return 'Rp 0';
+  if (n >= 1e9) return 'Rp ' + (n/1e9).toFixed(1) + ' M';
+  if (n >= 1e6) return 'Rp ' + (n/1e6).toFixed(1) + ' Jt';
+  if (n >= 1e3) return 'Rp ' + Math.round(n/1e3) + ' Rb';
+  return 'Rp ' + n;
+};
+const fmtDate = d => { try { return new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d||'—'; } };
+const today = () => new Date().toISOString().split('T')[0];
+const setText = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v??'—'; };
+const getEl = id => document.getElementById(id);
+
+function toast(msg, err=false) {
+  const t = getEl('toast');
+  t.textContent = msg;
+  t.className = err ? 'show err' : 'show';
+  setTimeout(() => t.className = '', 3200);
+}
+
+// ── CHARTS STATE ─────────────────────────────────────────────
+const charts = {};
+function destroyChart(id) { if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+const CC = { text:'rgba(232,240,235,.7)', grid:'rgba(30,52,40,.8)' };
+
+// ── LOGIN ───────────────────────────────────────────────────
+let loginRole = 'founder';
+function setRole(r) {
+  loginRole = r;
+  document.querySelectorAll('.role-tab').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-role') === r);
+  });
+  getEl('pw-group').style.display = r==='publik' ? 'none' : 'block';
+  if (r==='publik') { getEl('login-user').value=''; }
+  const hints = {
+    founder:   'founder',
+    manajemen: 'manajemen',
+    donatur:   'donatur',
+    relawan:   'relawan',
+    publik:    '— publik, tanpa login —'
+  };
+  const hintPw = {
+    founder:'admin123 (default)',manajemen:'mgt2025 (default)',
+    donatur:'donor123',relawan:'relawan123',publik:''
+  };
+  getEl('login-hint').innerHTML = r!=='publik'
+    ? `<span style="color:var(--muted)">Username: <strong style="color:var(--goldf)">${hints[r]}</strong> &nbsp;·&nbsp; Password: <strong style="color:var(--goldf)">${hintPw[r]}</strong></span>`
+    : `<span style="color:var(--muted)">Klik masuk langsung tanpa password</span>`;
+}
+
+function doLogin() {
+  if (loginRole === 'publik') { showPublikScreen(); return; }
+  const user = getEl('login-user').value.trim().toLowerCase();
+  const pw = getEl('login-pw').value.trim();
+  if (!user) { toast('⚠️ Username wajib diisi', true); return; }
+  if (!pw) { toast('⚠️ Password wajib diisi', true); return; }
+  const users = getUsers();
+  const found = users[user];
+  // Username tidak ditemukan
+  if (!found) { toast('⚠️ Username tidak ditemukan', true); return; }
+  // Password salah
+  if (found.pw !== pw) { toast('⚠️ Password salah', true); return; }
+  // Login berhasil — role dari database, tidak tergantung tab yang dipilih
+  CURRENT_USER = { ...found, username: user };
+  CURRENT_ROLE = found.role;
+  // Cek apakah harus ganti password
+  if (found.mustChangePw) {
+    showApp();
+    setTimeout(() => {
+      toast('⚠️ Password masih default! Segera ubah di Pengaturan → Keamanan', true);
+      setTimeout(() => navigateTo('p-setting'), 1500);
+    }, 800);
+  } else {
+    showApp();
+  }
+}
+
+function doLogout() {
+  showScreen('screen-login');
+  getEl('login-user').value = '';
+  getEl('login-pw').value = '';
+  getEl('login-pw').value = '';
+  setRole('founder');
+}
+
+function showPublikScreen() { showScreen('screen-publik'); loadPubStats(); }
+
+// ── SCREEN MANAGEMENT ───────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  getEl(id).classList.add('active');
+}
+
+function showApp() {
+  showScreen('screen-app');
+  buildNav();
+  updateUserUI();
+  if (GS_URL) {
+    getEl('gs-url-app').value = GS_URL;
+    getEl('set-gs-url') && (getEl('set-gs-url').value = GS_URL);
+    getEl('form-url-display') && (getEl('form-url-display').textContent = GS_URL);
+  }
+  // Load demo data first
+  CACHE = JSON.parse(JSON.stringify(DEMO));
+  renderAll();
+  initCharts();
+  // Try live connection
+  if (GS_URL) setTimeout(() => syncAll(true), 500);
+  setPageDate();
+  // Set first nav page
+  const firstPage = ROLES[CURRENT_ROLE].nav.find(n => n.id);
+  if (firstPage) navigateTo(firstPage.id);
+}
+
+function buildNav() {
+  const navEl = getEl('sb-nav');
+  navEl.innerHTML = '';
+  const navItems = ROLES[CURRENT_ROLE].nav;
+  navItems.forEach(item => {
+    if (item.sec) {
+      const s = document.createElement('div');
+      s.className = 'sb-sec'; s.textContent = item.sec;
+      navEl.appendChild(s);
+    } else {
+      const d = document.createElement('div');
+      d.className = 'sb-item'; d.setAttribute('data-page', item.id);
+      d.onclick = () => navigateTo(item.id);
+      let inner = `<span class="sb-ic">${item.icon}</span><span>${item.label}</span>`;
+      if (item.badgeKey && CACHE.summary) {
+        const v = CACHE.summary[item.badgeKey];
+        if (v) inner += `<span class="sb-badge">${v}</span>`;
+      }
+      if (item.new) inner += `<span class="sb-new">NEW</span>`;
+      d.innerHTML = inner;
+      navEl.appendChild(d);
+    }
+  });
+  // Action button
+  const role = ROLES[CURRENT_ROLE];
+  const tbBtn = getEl('tb-action-btn');
+  if (tbBtn) {
+    if (role.actionBtn) {
+      tbBtn.textContent = role.actionBtn.label;
+      tbBtn.style.display = '';
+      tbBtn.onclick = () => openModal(role.actionBtn.modal);
+    } else { tbBtn.style.display = 'none'; }
+  }
+}
+
+function updateUserUI() {
+  const role = ROLES[CURRENT_ROLE];
+  setText('sb-uname', CURRENT_USER.name);
+  setText('sb-urole', role.label);
+  getEl('sb-av').textContent = role.av;
+  getEl('sb-av').style.color = role.color;
+  setText('greeting-title', `Halo, ${CURRENT_USER.name} 👋`);
+  const roleSel = getEl('role-sel');
+  if (roleSel) roleSel.value = CURRENT_ROLE;
+  const roleBox = getEl('role-desc-box');
+  if (roleBox) roleBox.textContent = role.desc;
+}
+
+function navigateTo(pageId) {
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  const pg = getEl(pageId);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => {
+    i.classList.toggle('active', i.getAttribute('data-page') === pageId);
+  });
+  const titles = {
+    'p-overview':'Dashboard Overview','p-anak':'Anak Binaan','p-donasi':'Manajemen Donasi',
+    'p-pengeluaran':'Pengeluaran','p-relawan':'Relawan & Mentor','p-pertanian':'Lahan & Pertanian',
+    'p-transparansi':'Transparansi Publik','p-paket':'Paket Investasi','p-portal':'Portal Donatur',
+    'p-setting':'Pengaturan'
+  };
+  setText('tb-title', titles[pageId] || 'Dashboard');
+  // Lazy render charts when page becomes active
+  if (pageId === 'p-pertanian') setTimeout(initPanenChart, 100);
+  if (pageId === 'p-anak') setTimeout(initAnakDevChart, 100);
+  if (pageId === 'p-setting') setTimeout(renderSettingsPage, 50);
+}
+
+function setPageDate() {
+  setText('tb-date', new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+}
+
+// ── GOOGLE SHEETS API ────────────────────────────────────────
+function saveGSUrl() {
+  const url = getEl('gs-url-login').value.trim();
+  if (url) { GS_URL = url; localStorage.setItem('nc_gs_url', url); toast('✅ URL disimpan!'); }
+}
+
+function connectGS() {
+  const url = getEl('gs-url-app').value.trim();
+  if (!url) { toast('⚠️ Isi URL terlebih dulu', true); return; }
+  GS_URL = url; localStorage.setItem('nc_gs_url', url);
+  getEl('set-gs-url') && (getEl('set-gs-url').value = url);
+  getEl('form-url-display') && (getEl('form-url-display').textContent = url);
+  testConn();
+}
+
+function connectFromSettings() {
+  const url = getEl('set-gs-url')?.value?.trim();
+  if (!url) return;
+  GS_URL = url; localStorage.setItem('nc_gs_url', url);
+  getEl('gs-url-app') && (getEl('gs-url-app').value = url);
+  getEl('form-url-display') && (getEl('form-url-display').textContent = url);
+  testConn();
+}
+
+async function testConn() {
+  setText('set-conn-status','🔄 Menghubungkan...');
+  try {
+    const r = await fetch(GS_URL+'?action=test',{cache:'no-store'});
+    const d = await r.json();
+    if (d.status==='ok') {
+      setConnected(true);
+      setText('set-conn-status','✅ Terhubung! '+d.message);
+      await syncAll();
+    } else { throw new Error(d.message); }
+  } catch(e) {
+    setConnected(false);
+    setText('set-conn-status','❌ Gagal: '+e.message);
+    toast('❌ Gagal connect ke Sheets', true);
+  }
+}
+
+function disconnect() { GS_URL=''; CONNECTED=false; localStorage.removeItem('nc_gs_url'); setConnected(false); toast('🔌 Koneksi diputus'); }
+
+function setConnected(ok) {
+  CONNECTED = ok;
+  const dot = getEl('sb-conn-dot');
+  if (dot) { dot.className = 'sb-conn '+(ok?'on':'off'); }
+  const banner = getEl('conn-banner');
+  if (banner) banner.className = 'conn-banner'+(ok?' connected':'');
+  setText('conn-status', ok?'✅ Terhubung ke Google Sheets':'Belum terhubung');
+}
+
+async function apiCall(method, params={}) {
+  if (!GS_URL) return null;
+  try {
+    if (method==='GET') {
+      const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+      const r=await fetch(GS_URL+'?'+qs,{cache:'no-store'});
+      return r.json();
+    } else {
+      const r=await fetch(GS_URL,{method:'POST',body:JSON.stringify(params),headers:{'Content-Type':'application/json'}});
+      return r.json();
+    }
+  } catch(e) { console.warn('API err:',e); return null; }
+}
+
+async function syncAll(silent=false) {
+  if (!GS_URL) { if(!silent) toast('⚠️ Hubungkan Apps Script dulu',true); return; }
+  const btn = getEl('sync-btn');
+  btn?.classList.add('spin-active');
+  try {
+    const res = await apiCall('GET',{action:'getSummary'});
+    if (res?.status==='ok') {
+      CACHE.summary = res.summary;
+      setConnected(true);
+      // Load all sheets in parallel
+      const [don,anak,donatur,rel,kel] = await Promise.all([
+        apiCall('GET',{action:'getData',sheet:'Donasi'}),
+        apiCall('GET',{action:'getData',sheet:'Anak'}),
+        apiCall('GET',{action:'getData',sheet:'Donatur'}),
+        apiCall('GET',{action:'getData',sheet:'Relawan'}),
+        apiCall('GET',{action:'getData',sheet:'Pengeluaran'}),
+      ]);
+      if (don?.status==='ok') CACHE.Donasi = don.data;
+      if (anak?.status==='ok') CACHE.Anak = anak.data;
+      if (donatur?.status==='ok') CACHE.Donatur = donatur.data;
+      if (rel?.status==='ok') CACHE.Relawan = rel.data;
+      if (kel?.status==='ok') CACHE.Pengeluaran = kel.data;
+      renderAll();
+      initCharts();
+      setText('last-sync','Sync: '+new Date().toLocaleTimeString('id-ID'));
+      if (!silent) toast('✅ Data berhasil diperbarui!');
+    }
+  } catch(e) { if(!silent) toast('❌ Gagal sync: '+e.message,true); }
+  btn?.classList.remove('spin-active');
+}
+
+// ── RENDER ALL ───────────────────────────────────────────────
+function renderAll() {
+  const s = CACHE.summary || DEMO.summary;
+  // Overview stats
+  setText('s-anak', s.totalAnak);
+  setText('s-dana', fmtRp(s.totalDonasi));
+  setText('s-saldo', fmtRp(s.saldo));
+  setText('s-donatur', s.totalDonatur);
+  setText('s-relawan', s.totalRelawan);
+  setText('s-prog', s.progress+'%');
+  const pct = s.progress||0;
+  ['prog-bar','pt-bar'].forEach(id=>{ const e=getEl(id); if(e) e.style.width=pct+'%'; });
+  setText('prog-pct', pct+'%'); setText('pt-pct', pct+'%');
+  // Transparansi
+  setText('pt-masuk', fmtRp(s.totalDonasi)); setText('pt-keluar', fmtRp(s.totalKeluar||0));
+  setText('pt-saldo', fmtRp(s.saldo)); setText('pt-donatur', s.totalDonatur);
+  // Donasi section
+  const dons = CACHE.Donasi;
+  const dTotal = dons.reduce((a,d)=>a+(parseFloat(d['Jumlah'])||0),0);
+  setText('sd-total', fmtRp(dTotal)); setText('sd-count', dons.length);
+  setText('sd-avg', dons.length ? fmtRp(Math.round(dTotal/dons.length)) : 'Rp 0');
+  // Keluar
+  const kels = CACHE.Pengeluaran;
+  const kTotal = kels.reduce((a,k)=>a+(parseFloat(k['Jumlah'])||0),0);
+  setText('se-total', fmtRp(kTotal)); setText('se-count', kels.length);
+  // Relawan
+  setText('sv-total', CACHE.Relawan.length);
+  setText('sv-guru', CACHE.Relawan.filter(r=>String(r['Bidang Keahlian']).includes('Pengajar')).length);
+  setText('sv-psiko', CACHE.Relawan.filter(r=>String(r['Bidang Keahlian']).includes('Psikolog')).length);
+  // Anak
+  setText('sa-total', CACHE.Anak.length);
+  setText('sa-aktif', CACHE.Anak.filter(a=>a.Status==='Aktif').length);
+  // Donor portal
+  setText('d-total', fmtRp(dTotal));
+  const estROI = 10;
+  setText('d-roi', estROI+'%');
+  setText('d-return', fmtRp(Math.round(dTotal*estROI/100)));
+  // Render tables
+  renderDonasi(); renderAnak(); renderKeluar(); renderRelawan(); renderPubDonasi();
+  // Update nav badges
+  buildNav();
+  // Activity feed
+  renderActivity();
+}
+
+function renderDonasi() {
+  const el = getEl('tbl-donasi'); if(!el) return;
+  const pub = getEl('tbl-pub-donasi');
+  const data = [...CACHE.Donasi].reverse().slice(0,30);
+  if (!data.length) { el.innerHTML='<div class="empty"><div class="empty-icon">💰</div>Belum ada data.</div>'; return; }
+  const html = `<table class="tbl"><thead><tr><th>Tanggal</th><th>Donatur</th><th>Jumlah</th><th>Kategori</th><th>Metode</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody>`+
+    data.map(d=>`<tr><td>${fmtDate(d.Tanggal)}</td><td><strong>${d['Nama Donatur']}</strong></td>
+    <td><strong style="color:var(--goldf)">${fmtRp(d.Jumlah)}</strong></td>
+    <td><span class="badge b-green">${d.Kategori}</span></td>
+    <td><span class="badge b-muted">${d.Metode||'—'}</span></td>
+    <td style="color:var(--muted);font-size:.75rem">${d.Catatan||'—'}</td>
+    <td><button class="act-btn act-btn-r" onclick="deleteRow('Donasi','${d.ID}')">🗑️</button></td></tr>`).join('')+
+    '</tbody></table>';
+  el.innerHTML = html;
+  if (pub) pub.innerHTML = `<table class="tbl"><thead><tr><th>Tanggal</th><th>Donatur</th><th>Jumlah</th><th>Kategori</th></tr></thead><tbody>`+
+    data.map(d=>`<tr><td>${fmtDate(d.Tanggal)}</td><td>${d['Nama Donatur']}</td>
+    <td style="color:var(--goldf);font-weight:600">${fmtRp(d.Jumlah)}</td>
+    <td><span class="badge b-green">${d.Kategori}</span></td></tr>`).join('')+'</tbody></table>';
+}
+
+function renderAnak() {
+  const el = getEl('tbl-anak'); if(!el) return;
+  const data = CACHE.Anak;
+  if (!data.length) { el.innerHTML='<div class="empty"><div class="empty-icon">👦</div>Belum ada data.</div>'; return; }
+  el.innerHTML = `<div class="anak-grid">`+data.map(a=>{
+    const prog_map={'Pendidikan Dasar':25,'Paket C Setara SMA':60,'Skill Digital':45,'Skill Kreatif':40,'Pertanian Organik':35};
+    const prog = prog_map[a.Program]||30;
+    return `<div class="anak-card">
+      <div class="anak-av">👦</div>
+      <div class="anak-name">${a.Nama}</div>
+      <div class="anak-prog">${a.Program} · ${a.Usia||'—'} thn</div>
+      <div style="margin-bottom:.4rem"><span class="badge ${a.Status==='Aktif'?'b-green':'b-muted'}">${a.Status}</span></div>
+      <div class="anak-skill-bar"><div class="anak-skill-fill" style="width:${prog}%"></div></div>
+      <div style="font-size:.65rem;color:var(--muted);margin-top:.2rem">Progress ${prog}%</div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function renderKeluar() {
+  const el = getEl('tbl-keluar'); if(!el) return;
+  const data = [...CACHE.Pengeluaran].reverse();
+  if (!data.length) { el.innerHTML='<div class="empty"><div class="empty-icon">📤</div>Belum ada data.</div>'; return; }
+  el.innerHTML = `<table class="tbl"><thead><tr><th>Tanggal</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>`+
+    data.map(d=>`<tr><td>${fmtDate(d.Tanggal)}</td><td><span class="badge b-red">${d.Kategori}</span></td>
+    <td>${d.Keterangan}</td><td style="color:var(--red);font-weight:600">${fmtRp(d.Jumlah)}</td>
+    <td><button class="act-btn act-btn-r" onclick="deleteRow('Pengeluaran','${d.ID}')">🗑️</button></td></tr>`).join('')+'</tbody></table>';
+}
+
+function renderRelawan() {
+  const el = getEl('tbl-relawan'); if(!el) return;
+  const data = CACHE.Relawan;
+  if (!data.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🤝</div>Belum ada data.</div>'; return; }
+  el.innerHTML = `<table class="tbl"><thead><tr><th>Nama</th><th>Bidang</th><th>Instansi</th><th>Kontak</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`+
+    data.map(r=>`<tr><td><strong>${r.Nama}</strong></td>
+    <td><span class="badge b-blue">${r['Bidang Keahlian']}</span></td>
+    <td>${r.Instansi||'—'}</td><td style="color:var(--muted);font-size:.75rem">${r.Kontak||'—'}</td>
+    <td><span class="badge b-green">${r.Status||'Aktif'}</span></td>
+    <td><button class="act-btn act-btn-r" onclick="deleteRow('Relawan','${r.ID}')">🗑️</button></td></tr>`).join('')+'</tbody></table>';
+}
+
+function renderPubDonasi() { renderDonasi(); }
+
+function renderActivity() {
+  const el = getEl('activity-feed'); if(!el) return;
+  const items = [];
+  [...CACHE.Donasi].reverse().slice(0,3).forEach(d => items.push({ icon:'💰', bg:'rgba(212,160,23,.15)', t:`Donasi masuk dari ${d['Nama Donatur']}`, m:`${fmtRp(d.Jumlah)} · ${fmtDate(d.Tanggal)}` }));
+  [...CACHE.Anak].reverse().slice(0,2).forEach(a => items.push({ icon:'👦', bg:'rgba(82,183,136,.15)', t:`Anak binaan baru: ${a.Nama}`, m:`${a.Program} · Bergabung ${fmtDate(a['Tanggal Bergabung'])}` }));
+  if (!items.length) { el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>Belum ada aktivitas.</div>'; return; }
+  el.innerHTML = items.slice(0,6).map(i=>`<div class="act-item">
+    <div class="act-icon" style="background:${i.bg}">${i.icon}</div>
+    <div class="act-body"><div class="act-t">${i.t}</div><div class="act-m">${i.m}</div></div>
+  </div>`).join('');
+}
+
+// ── CHARTS ──────────────────────────────────────────────────
+function initCharts() {
+  initMonthlyChart();
+  initProgChart();
+  initMarketChart();
+}
+
+function initMonthlyChart() {
+  destroyChart('monthly');
+  const ctx = getEl('chart-monthly'); if(!ctx) return;
+  const months = {};
+  CACHE.Donasi.forEach(d => {
+    const k=(d.Tanggal||'').slice(0,7);
+    if(k) months[k]=(months[k]||0)+(parseFloat(d.Jumlah)||0);
+  });
+  let labels=Object.keys(months).sort().slice(-8);
+  let vals=labels.map(k=>months[k]);
+  if(!labels.length) { labels=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu']; vals=[0,0,0,0,0,0,0,87500000]; }
+  charts['monthly']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Donasi',data:vals,backgroundColor:'rgba(82,183,136,.45)',borderColor:'rgba(82,183,136,1)',borderWidth:1,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:CC.text,font:{size:10},callback:v=>fmtRp(v)},grid:{color:CC.grid}},x:{ticks:{color:CC.text,font:{size:10}},grid:{display:false}}}}});
+}
+
+function initProgChart() {
+  destroyChart('prog');
+  const ctx = getEl('chart-prog'); if(!ctx) return;
+  const progs={};
+  CACHE.Anak.forEach(a=>{ const p=a.Program||'Lain'; progs[p]=(progs[p]||0)+1; });
+  const lbl=Object.keys(progs).length?Object.keys(progs):['Paket C','Skill','Pertanian'];
+  const dt=Object.keys(progs).length?Object.values(progs):[2,3,2];
+  charts['prog']=new Chart(ctx,{type:'doughnut',data:{labels:lbl,datasets:[{data:dt,backgroundColor:['#52B788','#D4A017','#4A9ECC','#9B59B6','#E05252'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:CC.text,font:{size:10},boxWidth:10}}},cutout:'65%'}});
+}
+
+function initMarketChart() {
+  destroyChart('market');
+  const ctx = getEl('chart-market'); if(!ctx) return;
+  charts['market']=new Chart(ctx,{type:'doughnut',data:{labels:['Plan A: Ekspor Rempah','Plan B: Lokal/Resto','Ternak & Dapur'],datasets:[{data:[60,25,15],backgroundColor:['#1A5276','#52B788','#D4A017'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:CC.text,font:{size:10},boxWidth:10}}},cutout:'65%'}});
+}
+
+function initPanenChart() {
+  destroyChart('panen');
+  const ctx = getEl('chart-panen'); if(!ctx) return;
+  charts['panen']=new Chart(ctx,{type:'bar',data:{labels:['Jahe Merah','Kunyit','Sereh','Cabai','Sayur Resto','Ternak'],datasets:[{label:'Lokal (Rp)',data:[225000000,75000000,90000000,175000000,45000000,80000000],backgroundColor:'rgba(82,183,136,.5)',borderRadius:4},{label:'Ekspor (Rp)',data:[525000000,175000000,180000000,437500000,0,0],backgroundColor:'rgba(26,82,118,.5)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10}}}},scales:{x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}},y:{ticks:{color:CC.text,font:{size:9},callback:v=>fmtRp(v)},grid:{color:CC.grid}},stacked:false}}});
+}
+
+function initAnakDevChart() {
+  destroyChart('anak-dev');
+  const ctx = getEl('chart-anak-dev'); if(!ctx) return;
+  charts['anak-dev']=new Chart(ctx,{type:'radar',data:{labels:['Akademik','Skill Kreatif','Digital','Pertanian','Psikologi','Kepemimpinan','Sosial'],datasets:[{label:'Rata-rata Tim',data:[3.5,3.2,2.8,3.8,3.1,2.9,3.6],backgroundColor:'rgba(82,183,136,.2)',borderColor:'rgba(82,183,136,.8)',borderWidth:2,pointBackgroundColor:'#52B788'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10}}}},scales:{r:{ticks:{color:CC.text,backdropColor:'transparent',font:{size:9}},grid:{color:CC.grid},pointLabels:{color:CC.text,font:{size:10}},min:0,max:5}}}});
+}
+
+// ── PAKET INVESTASI ─────────────────────────────────────────
+const PAKET_LIST = [
+  { icon:'🌱', name:'Paket KASIH', price:'Rp 500rb – 5 Jt', desc:'Bibit · Pupuk · ATK anak\nSponsor 1 bedeng 100m²', badge:null, modal:'m-donasi' },
+  { icon:'🛡️', name:'Paket SKILL', price:'Rp 5 – 20 Jt', desc:'Laptop · Alat skill · Modul\nSponsor 1 modul skill center', badge:null, modal:'m-donasi' },
+  { icon:'⚡', name:'Paket USAHA', price:'Rp 20 – 50 Jt', desc:'Lahan 1.000m² · 2 pasang ternak\nPaket mulai 1 Tim (5 anak)', badge:'★ PILIHAN UTAMA', modal:'m-donasi' },
+  { icon:'🏆', name:'Paket EKSPOR', price:'Rp 50 Jt+', desc:'1 Ha rempah ekspor\nROI + bagi hasil panen', badge:null, modal:'m-donasi' },
+  { icon:'🏢', name:'Paket CSR', price:'Rp 100 Jt+', desc:'Program CSR terstruktur\nLaporan dampak resmi', badge:'CSR', modal:'m-donasi' },
+  { icon:'🌏', name:'Grant Internasional', price:'USD 25k+', desc:'Untuk lembaga donor asing\nSDGs aligned program', badge:'INTL', modal:'m-donasi' },
+];
+function renderPaket() {
+  const el = getEl('paket-list'); if(!el) return;
+  el.innerHTML = PAKET_LIST.map(p=>`<div class="paket-card ${p.badge==='★ PILIHAN UTAMA'?'selected':''}" onclick="openModal('${p.modal}')">
+    ${p.badge?`<span class="pk-badge badge ${p.badge==='★ PILIHAN UTAMA'?'b-gold':'b-blue'}">${p.badge}</span>`:''}
+    <div class="pk-icon">${p.icon}</div>
+    <div class="pk-name">${p.name}</div>
+    <div class="pk-price">${p.price}</div>
+    <div class="pk-desc">${p.desc}</div>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// PASSWORD & USER MANAGEMENT
+// ══════════════════════════════════════════════════════════════
+
+function changeMyPassword() {
+  const oldPw    = (getEl('pw-old')     || {}).value?.trim() || '';
+  const newPw    = (getEl('pw-new')     || {}).value?.trim() || '';
+  const confirm  = (getEl('pw-confirm') || {}).value?.trim() || '';
+  const status   = getEl('pw-status');
+  const users    = getUsers();
+  const uname    = CURRENT_USER.username;
+
+  const setStatus = (msg, ok) => {
+    if (status) status.innerHTML = `<span style="color:${ok?'var(--light)':'var(--red)'}">${msg}</span>`;
+  };
+
+  if (!oldPw || !newPw || !confirm) { setStatus('⚠️ Semua field wajib diisi', false); return; }
+  if (!users[uname] || users[uname].pw !== oldPw) { setStatus('⚠️ Password lama salah', false); return; }
+  if (newPw.length < 8) { setStatus('⚠️ Password baru minimal 8 karakter', false); return; }
+  if (newPw !== confirm) { setStatus('⚠️ Konfirmasi tidak cocok', false); return; }
+
+  users[uname].pw = newPw;
+  users[uname].mustChangePw = false;
+  saveUsers(users);
+  ['pw-old','pw-new','pw-confirm'].forEach(id => { const el = getEl(id); if(el) el.value=''; });
+  setStatus('✅ Password berhasil diubah!', true);
+  toast('✅ Password berhasil diubah!');
+  setTimeout(() => { if(status) status.innerHTML=''; }, 4000);
+}
+
+function renderUserMgmt() {
+  const el = getEl('user-mgmt-body');
+  if (!el) return;
+
+  if (!canDo('canSettings')) {
+    el.innerHTML = '<div style="font-size:.82rem;color:var(--red);padding:.6rem 0">🔒 Hanya Founder & Manajemen yang bisa kelola akun user.</div>';
+    return;
+  }
+
+  const users = getUsers();
+  const roleColors = { founder:'var(--goldf)', manajemen:'var(--light)', donatur:'var(--blue)', relawan:'var(--mint)' };
+
+  let h = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+    <tr style="border-bottom:1px solid var(--border)">
+      <th style="text-align:left;font-size:.65rem;color:var(--muted);padding:.5rem .7rem;text-transform:uppercase;letter-spacing:.06em">Username</th>
+      <th style="text-align:left;font-size:.65rem;color:var(--muted);padding:.5rem .7rem;text-transform:uppercase;letter-spacing:.06em">Nama</th>
+      <th style="text-align:left;font-size:.65rem;color:var(--muted);padding:.5rem .7rem;text-transform:uppercase;letter-spacing:.06em">Role</th>
+      <th style="text-align:center;font-size:.65rem;color:var(--muted);padding:.5rem .7rem;text-transform:uppercase;letter-spacing:.06em">Status PW</th>
+      <th style="text-align:center;font-size:.65rem;color:var(--muted);padding:.5rem .7rem;text-transform:uppercase;letter-spacing:.06em">Aksi</th>
+    </tr>`;
+
+  Object.entries(users).forEach(([uname, u]) => {
+    const isMe      = uname === CURRENT_USER.username;
+    const isFounder = u.role === 'founder';
+    const canReset  = !(CURRENT_ROLE === 'manajemen' && isFounder);
+    const bgRow     = isMe ? 'background:rgba(82,183,136,.05)' : '';
+    h += `<tr style="border-bottom:1px solid rgba(30,52,40,.35);${bgRow}">
+      <td style="padding:.55rem .7rem;font-size:.82rem;font-weight:600;color:var(--text)">${uname}${isMe ? ' <span style="font-size:.62rem;color:var(--mint)">(Saya)</span>' : ''}</td>
+      <td style="padding:.55rem .7rem;font-size:.82rem;color:var(--text)">${u.name}</td>
+      <td style="padding:.55rem .7rem"><span style="font-size:.68rem;font-weight:700;color:${roleColors[u.role]||'var(--muted)'};background:rgba(82,183,136,.08);padding:.15rem .5rem;border-radius:20px">${u.role}</span></td>
+      <td style="padding:.55rem .7rem;font-size:.75rem;text-align:center;color:${u.mustChangePw?'var(--red)':'var(--muted)'}">${u.mustChangePw ? '⚠️ Wajib ganti' : '✅ OK'}</td>
+      <td style="padding:.55rem .7rem;text-align:center">${(!isMe && canReset) ? `<button onclick="resetUserPw('${uname}')" style="background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.3);color:var(--goldf);padding:.22rem .6rem;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:inherit">Reset PW</button>` : '—'}</td>
+    </tr>`;
+  });
+  h += '</table></div>';
+
+  if (CURRENT_ROLE === 'founder') {
+    h += `<div style="margin-top:1.2rem;border-top:1px solid var(--border);padding-top:1rem">
+      <div style="font-size:.82rem;font-weight:700;color:var(--goldf);margin-bottom:.7rem">➕ Tambah Akun Baru</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:.6rem;align-items:flex-end;flex-wrap:wrap">
+        <div><label style="font-size:.62rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:.22rem">Username</label><input type="text" class="fi" id="nu-user" placeholder="username" style="font-size:.82rem"></div>
+        <div><label style="font-size:.62rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:.22rem">Nama</label><input type="text" class="fi" id="nu-name" placeholder="Nama lengkap" style="font-size:.82rem"></div>
+        <div><label style="font-size:.62rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:.22rem">Role</label>
+          <select class="fi" id="nu-role" style="font-size:.82rem">
+            <option value="manajemen">🏛️ Manajemen</option>
+            <option value="donatur">💰 Donatur</option>
+            <option value="relawan">🤝 Relawan</option>
+          </select></div>
+        <div><label style="font-size:.62rem;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:.22rem">Password Awal</label><input type="text" class="fi" id="nu-pw" placeholder="Min 8 karakter" style="font-size:.82rem"></div>
+        <button onclick="addNewUser()" class="btn btn-gold" style="height:38px;white-space:nowrap">+ Tambah</button>
+      </div>
+    </div>`;
+  }
+  el.innerHTML = h;
+}
+
+function resetUserPw(uname) {
+  if (!canDo('canSettings')) { toast('🔒 Akses ditolak', true); return; }
+  const users = getUsers();
+  if (CURRENT_ROLE === 'manajemen' && users[uname]?.role === 'founder') {
+    toast('🔒 Manajemen tidak bisa reset password Founder', true); return;
+  }
+  const newPw = prompt('Reset password untuk "' + uname + '"\nMasukkan password baru (min 8 karakter):');
+  if (!newPw || newPw.length < 8) { toast('⚠️ Minimal 8 karakter', true); return; }
+  users[uname].pw = newPw;
+  users[uname].mustChangePw = true;
+  saveUsers(users);
+  renderUserMgmt();
+  toast('✅ Password "' + uname + '" berhasil direset!');
+}
+
+function addNewUser() {
+  if (CURRENT_ROLE !== 'founder') { toast('🔒 Hanya Founder yang bisa tambah akun', true); return; }
+  const uname = (getEl('nu-user')?.value || '').trim().toLowerCase();
+  const name  = (getEl('nu-name')?.value || '').trim();
+  const role  = getEl('nu-role')?.value || 'donatur';
+  const pw    = (getEl('nu-pw')?.value  || '').trim();
+  if (!uname || !name || !pw || pw.length < 8) { toast('⚠️ Semua field wajib, password min 8 karakter', true); return; }
+  const users = getUsers();
+  if (users[uname]) { toast('⚠️ Username "' + uname + '" sudah ada', true); return; }
+  users[uname] = { pw, role, name, email: uname+'@nawacahaya.org', mustChangePw: true };
+  saveUsers(users);
+  ['nu-user','nu-name','nu-pw'].forEach(id => { const el = getEl(id); if(el) el.value=''; });
+  renderUserMgmt();
+  toast('✅ Akun "' + uname + '" (' + role + ') berhasil dibuat!');
+}
+
+function renderSettingsPage() {
+  const canSettings = canDo('canSettings');
+  // Show/hide restricted cards
+  ['card-gs-conn','card-gs-guide'].forEach(id => {
+    const el = getEl(id);
+    if (el) el.style.display = canSettings ? 'block' : 'none';
+  });
+  // Always show user mgmt card (with internal permission check)
+  const cardUm = getEl('card-user-mgmt');
+  if (cardUm) cardUm.style.display = 'block';
+  // Sync GS URL field
+  const gsField = getEl('set-gs-url');
+  if (gsField && GS_URL) gsField.value = GS_URL;
+  // Render user table
+  renderUserMgmt();
+}
+
+renderPaket();
+
+// ── PUBLIC STATS ─────────────────────────────────────────────
+async function loadPubStats() {
+  const s = CACHE.summary || DEMO.summary;
+  setText('pub-anak', s.totalAnak||'7');
+  setText('pub-donatur', s.totalDonatur||'9');
+  setText('pub-prog', (s.progress||14)+'%');
+  if (GS_URL) {
+    try {
+      const r = await apiCall('GET',{action:'getSummary'});
+      if (r?.status==='ok') {
+        setText('pub-anak', r.summary.totalAnak);
+        setText('pub-donatur', r.summary.totalDonatur);
+        setText('pub-prog', r.summary.progress+'%');
+      }
+    } catch(e) {}
+  }
+}
+
+// ── SUBMIT HANDLERS ─────────────────────────────────────────
+async function submitToSheets(sheet, data, msg) {
+  if (GS_URL) {
+    const r = await apiCall('POST',{action:'append',sheet,data});
+    if (r?.status==='ok') { closeModal(); toast('✅ '+msg); await syncAll(true); return true; }
+    else { toast('❌ Gagal simpan: '+(r?.message||'Error'),true); return false; }
+  } else {
+    // Demo mode — add to local cache
+    const id = sheet.slice(0,3)+'-'+String(Date.now()).slice(-6);
+    CACHE[sheet] && CACHE[sheet].push({ID:id,...data});
+    if (CACHE.summary) {
+      if (sheet==='Donasi') { CACHE.summary.totalDonasi+=parseInt(data.amount||data.Jumlah||0); CACHE.summary.jumlahDonasi++; }
+      if (sheet==='Anak') { CACHE.summary.totalAnak++; CACHE.summary.anakAktif++; }
+      if (sheet==='Relawan') { CACHE.summary.totalRelawan++; }
+      CACHE.summary.saldo = CACHE.summary.totalDonasi - CACHE.summary.totalKeluar;
+      CACHE.summary.progress = Math.min(100,Math.round(CACHE.summary.totalDonasi/TARGET*100));
+    }
+    closeModal(); toast('✅ '+msg+' (mode demo)'); renderAll(); initCharts(); return true;
+  }
+}
+
+function requireWrite() {
+  if (!canDo('canWrite')) {
+    toast('🔒 Akses ditolak — hanya Founder & Manajemen yang bisa mengubah data', true);
+    return false;
+  }
+  return true;
+}
+
+function submitDonasi() {
+  if (!requireWrite()) return;
+  const name=getEl('m-dn').value.trim(), amt=parseInt(getEl('m-da').value)||0;
+  if (!name||!amt) { toast('⚠️ Nama & jumlah wajib diisi',true); return; }
+  submitToSheets('Donasi',{donor:name,amount:amt,category:getEl('m-dc').value,method:getEl('m-dm').value,note:getEl('m-dno').value,date:getEl('m-dd').value||today()},'Donasi dicatat!');
+}
+function submitAnak() {
+  if (!requireWrite()) return;
+  const name=getEl('m-an').value.trim();
+  if (!name) { toast('⚠️ Nama wajib diisi',true); return; }
+  submitToSheets('Anak',{name,age:getEl('m-aa').value,program:getEl('m-ap').value,date:getEl('m-atgl').value||today(),status:'Aktif',note:getEl('m-ano').value},'Anak binaan ditambahkan!');
+}
+function submitKeluar() {
+  if (!requireWrite()) return;
+  const amt=parseInt(getEl('m-ka').value)||0, desc=getEl('m-kno').value.trim();
+  if (!amt||!desc) { toast('⚠️ Jumlah & keterangan wajib',true); return; }
+  submitToSheets('Pengeluaran',{category:getEl('m-kc').value,amount:amt,description:desc,date:getEl('m-kd').value||today()},'Pengeluaran dicatat!');
+}
+function submitRelawan() {
+  if (!requireWrite()) return;
+  const name=getEl('m-rn').value.trim();
+  if (!name) { toast('⚠️ Nama wajib diisi',true); return; }
+  submitToSheets('Relawan',{name,skill:getEl('m-rsk').value,org:getEl('m-rorg').value,contact:getEl('m-rp').value,date:today()},'Relawan didaftarkan!');
+}
+
+function deleteRow(sheet, id) {
+  if (!requireWrite()) return;
+  getEl('confirm-msg').textContent='Hapus data ini? Tindakan tidak bisa dibatalkan.';
+  getEl('confirm-yes').onclick = async () => {
+    closeModal();
+    if (GS_URL) {
+      const r = await apiCall('POST',{action:'delete',sheet,data:{id}});
+      if (r?.status==='ok') { toast('🗑️ Data dihapus'); await syncAll(true); }
+      else toast('❌ Gagal hapus',true);
+    } else {
+      if (CACHE[sheet]) { CACHE[sheet] = CACHE[sheet].filter(i=>i.ID!==id); }
+      toast('🗑️ Dihapus (demo)'); renderAll();
+    }
+  };
+  openModal('m-confirm');
+}
+
+// Public form submissions
+let selectedAmt = 0;
+function pickAmt(val, btn) {
+  document.querySelectorAll('.amount-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selectedAmt = val;
+  if (val===0) { getEl('pub-amt').value=''; getEl('pub-amt').focus(); }
+  else getEl('pub-amt').value=val;
+}
+async function submitPubDonasi() {
+  const amt=parseInt(getEl('pub-amt').value)||selectedAmt;
+  const name=getEl('pub-dn').value.trim();
+  if (!amt||amt<10000) { alert('Nominal minimal Rp 10.000'); return; }
+  if (!name) { alert('Nama wajib diisi'); return; }
+  await submitToSheets('Donasi',{donor:name,amount:amt,category:getEl('pub-dcat').value,method:'Form Online',note:getEl('pub-dnote').value,contact:getEl('pub-dp').value,date:today()},'Donasi dicatat!');
+  getEl('pub-donasi-body').style.display='none';
+  getEl('pub-donasi-ok').classList.add('show');
+}
+async function submitPubRelawan() {
+  const name=getEl('pub-rn').value.trim(),phone=getEl('pub-rp').value.trim(),skill=getEl('pub-rsk').value;
+  if (!name||!phone||!skill) { alert('Nama, WhatsApp, dan bidang wajib diisi'); return; }
+  await submitToSheets('Relawan',{name,contact:phone,email:getEl('pub-re').value,instagram:getEl('pub-rig').value,skill,org:getEl('pub-rorg').value,motivation:getEl('pub-rmot').value,date:today()},'Relawan didaftarkan!');
+  getEl('pub-relawan-body').style.display='none';
+  getEl('pub-relawan-ok').classList.add('show');
+}
+async function submitPubCSR() {
+  const company=getEl('pub-cn').value.trim(),pic=getEl('pub-cpic').value.trim(),email=getEl('pub-cemail').value.trim();
+  if (!company||!pic||!email) { alert('Perusahaan, PIC, dan email wajib diisi'); return; }
+  await submitToSheets('Donatur',{name:company+' (via '+pic+')',type:getEl('pub-ct').value,status:'Proposal Dikirim',email,potential:0,note:'Budget: '+getEl('pub-cbudget').value+' | '+getEl('pub-cnote').value,date:today()},'Proposal diterima!');
+  getEl('pub-csr-body').style.display='none';
+  getEl('pub-csr-ok').classList.add('show');
+}
+function resetPubForm(form) {
+  getEl('pub-'+form+'-body').style.display='block';
+  getEl('pub-'+form+'-ok').classList.remove('show');
+}
+
+// deleteRow sudah didefinisikan di atas dengan guard canWrite
+
+// ── MODAL ───────────────────────────────────────────────────
+function openModal(id) {
+  const ov=getEl('modal-overlay'); ov.style.display='flex';
+  document.querySelectorAll('.modal-box').forEach(m=>m.style.display='none');
+  const m=getEl(id); if(m) { m.style.display='block'; m.querySelectorAll('input[type=date]').forEach(d=>{if(!d.value)d.value=today();}); }
+}
+function closeModal(e) {
+  if (e && e.target.id!=='modal-overlay') return;
+  getEl('modal-overlay').style.display='none';
+}
+
+// ── PUBLIC TABS ─────────────────────────────────────────────
+function pubTab(id) {
+  document.querySelectorAll('.pub-tab').forEach((t,i)=>t.classList.toggle('active',['donasi','relawan','csr'][i]===id));
+  document.querySelectorAll('.pub-panel').forEach(p=>p.classList.remove('active'));
+  getEl('pub-'+id).classList.add('active');
+}
+
+// ── ROLE SWITCH ─────────────────────────────────────────────
+function switchRole(role) { /* Disabled — role tied to login account */ }
+
+// ── SIDEBAR MOBILE ─────────────────────────────────────────
+function toggleSidebar() { getEl('sidebar').classList.toggle('open'); }
+
+// ── TICKER ANIMATION ────────────────────────────────────────
+const tickers = [
+  '🌿 Transparansi 24/7 aktif — semua donasi tercatat dan dapat dicek publik kapanpun',
+  '📊 Bagi hasil: Yayasan 40% · Donatur 10% · Tenaga Lokal 40% · Anak Binaan 3%',
+  '🌱 Pertanian 100% organik — zero pestisida, pupuk dari kotoran ternak sendiri',
+  '🌏 Rempah ekspor: Jahe Merah Rp 80.000/kg · Kunyit Rp 35.000/kg · Sereh Rp 130.000/L',
+  '👦 Setiap anak binaan memiliki tracker perkembangan skill & psikologi pribadi',
+];
+let tickIdx = 0;
+setInterval(()=>{ tickIdx=(tickIdx+1)%tickers.length; setText('ticker-text', tickers[tickIdx]); }, 5000);
+
+// ── INIT ─────────────────────────────────────────────────────
+if (GS_URL) getEl('gs-url-login').value = GS_URL;
+// setRole('admin') removed
+</script>
+</body>
+</html>
