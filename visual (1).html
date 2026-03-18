@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nawa Cahaya — Visual Presentasi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+:root{
+  --deep:#1B4332;--mid:#2D6A4F;--light:#52B788;--mint:#95D5B2;
+  --gold:#D4A017;--goldf:#F9C74F;--cream:#FFFDE7;
+  --bg:#0C1510;--panel:#111E17;--card:#172419;--border:#1E3428;
+  --text:#E8F0EB;--muted:#6B8F78;
+  --red:#E05252;--blue:#4A9ECC;--purple:#9B59B6;--orange:#E67E22;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+/* NAV TABS */
+.nav{display:flex;background:var(--panel);border-bottom:1px solid var(--border);overflow-x:auto;position:sticky;top:0;z-index:100;padding:.4rem .8rem;gap:.4rem}
+.nav-tab{display:flex;align-items:center;gap:.5rem;padding:.55rem 1.2rem;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);white-space:nowrap;transition:all .2s;font-family:inherit}
+.nav-tab:hover{background:rgba(82,183,136,.08);color:var(--text)}
+.nav-tab.active{background:rgba(82,183,136,.15);color:var(--mint);border:1px solid rgba(82,183,136,.25)}
+.nav-tab .dot{width:7px;height:7px;border-radius:50%}
+/* SECTIONS */
+.section{display:none;padding:2rem 1.5rem;max-width:1200px;margin:0 auto;animation:fadeUp .35s ease}
+.section.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* HEADERS */
+.sec-header{margin-bottom:2rem}
+.sec-eyebrow{font-size:.65rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.sec-title{font-family:"Playfair Display",serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;color:var(--text);line-height:1.15;margin-bottom:.5rem}
+.sec-title em{color:var(--goldf);font-style:italic}
+.sec-sub{font-size:.9rem;color:var(--muted);max-width:620px;line-height:1.7}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-head{padding:.9rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:.82rem;font-weight:700;color:var(--text)}
+.card-body{padding:1.3rem}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.4rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;margin-bottom:1.4rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.4rem}
+/* STAT */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.85rem;margin-bottom:1.5rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;top:0;left:0;right:0;height:2.5px}
+.sg::before{background:var(--light)}.sy::before{background:var(--gold)}.sb::before{background:var(--blue)}.sr::before{background:var(--red)}.sp::before{background:var(--purple)}
+.stat-label{font-size:.62rem;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.3rem}
+.stat-val{font-size:1.6rem;font-weight:700;color:var(--text);line-height:1}
+.stat-note{font-size:.68rem;color:var(--muted);margin-top:.2rem}
+/* CHART WRAP */
+.ch{position:relative}
+.ch.h200{height:200px}.ch.h240{height:240px}.ch.h280{height:280px}.ch.h320{height:320px}.ch.h360{height:360px}
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{content:"";position:absolute;left:.6rem;top:.5rem;bottom:.5rem;width:2px;background:linear-gradient(to bottom,var(--gold),var(--light),var(--mid))}
+.tl-item{position:relative;padding:.9rem 0 .9rem 1.2rem;margin-bottom:.3rem}
+.tl-dot{position:absolute;left:-1.3rem;top:1.1rem;width:14px;height:14px;border-radius:50%;border:2px solid var(--gold);background:var(--bg);flex-shrink:0}
+.tl-dot.active{background:var(--gold)}
+.tl-date{font-size:.65rem;color:var(--gold);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.15rem}
+.tl-title{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:.2rem}
+.tl-desc{font-size:.78rem;color:var(--muted);line-height:1.6}
+/* ROI CALC */
+.roi-input{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.roi-label{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.roi-slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);outline:none}
+.roi-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg)}
+.roi-val{font-size:1.1rem;font-weight:700;color:var(--goldf)}
+.roi-result{background:linear-gradient(135deg,var(--deep),#0f2d1f);border:1px solid rgba(212,160,23,.25);border-radius:14px;padding:1.4rem;margin-top:1rem}
+.roi-big{font-size:2.8rem;font-weight:700;color:var(--white)}
+.roi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem}
+.roi-item .rv{font-size:1.3rem;font-weight:700;color:var(--goldf)}
+.roi-item .rl{font-size:.7rem;color:var(--mint)}
+/* FLOW */
+.flow{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin:1rem 0}
+.flow-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem;font-size:.82rem;font-weight:600;color:var(--text);text-align:center;flex:1;min-width:110px}
+.flow-box.highlight{background:rgba(82,183,136,.12);border-color:rgba(82,183,136,.3);color:var(--mint)}
+.flow-box.gold{background:rgba(212,160,23,.1);border-color:rgba(212,160,23,.3);color:var(--goldf)}
+.flow-arrow{color:var(--muted);font-size:1.1rem;flex-shrink:0}
+/* TERNAK VISUAL */
+.ternak-cycle{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1rem 0}
+.tc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;text-align:center;cursor:pointer;transition:all .2s}
+.tc-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.tc-card.active-tc{border-color:var(--light);background:rgba(82,183,136,.08)}
+.tc-icon{font-size:1.8rem;margin-bottom:.5rem}
+.tc-name{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+.tc-val{font-size:.75rem;color:var(--mint)}
+.tc-detail{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-top:1rem;animation:fadeUp .25s ease}
+/* BAGI HASIL WHEEL */
+.bh-wrap{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.bh-chart{width:180px;height:180px;flex-shrink:0}
+.bh-legend{display:flex;flex-direction:column;gap:.7rem;flex:1}
+.bh-item{display:flex;align-items:center;gap:.7rem}
+.bh-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.bh-name{font-size:.85rem;font-weight:600;color:var(--text)}
+.bh-pct{font-size:1.1rem;font-weight:700;color:var(--goldf);margin-left:auto}
+/* PROGRESS BAR */
+.prog{margin:.5rem 0}
+.prog-label{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:.3rem}
+.prog-label span:first-child{color:var(--muted)}
+.prog-label span:last-child{color:var(--goldf);font-weight:600}
+.prog-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--mid),var(--light));transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.prog-fill.gold{background:linear-gradient(90deg,var(--gold),var(--goldf))}
+.prog-fill.blue{background:linear-gradient(90deg,#1A5276,var(--blue))}
+.prog-fill.red{background:linear-gradient(90deg,#7B241C,var(--red))}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.65rem;font-weight:700;padding:.18rem .55rem;border-radius:20px}
+.b-green{background:rgba(82,183,136,.15);color:var(--light)}
+.b-gold{background:rgba(212,160,23,.15);color:var(--goldf)}
+.b-blue{background:rgba(74,158,204,.15);color:var(--blue)}
+.b-red{background:rgba(224,82,82,.15);color:var(--red)}
+.b-purple{background:rgba(155,89,182,.15);color:var(--purple)}
+/* PETANI / TERNAK CARDS */
+.benefit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1rem 0}
+.benefit-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;border-top:3px solid transparent;transition:all .2s}
+.benefit-card:hover{transform:translateY(-3px)}
+.benefit-card.gc{border-top-color:var(--light)}
+.benefit-card.gy{border-top-color:var(--gold)}
+.benefit-card.gb{border-top-color:var(--blue)}
+.benefit-card.gp{border-top-color:var(--purple)}
+.bc-icon{font-size:1.5rem;margin-bottom:.5rem}
+.bc-title{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
+.bc-text{font-size:.76rem;color:var(--muted);line-height:1.6}
+/* COMPARE TABLE */
+table.ct{width:100%;border-collapse:collapse}
+.ct th{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:.6rem .9rem;border-bottom:1px solid var(--border);text-align:left}
+.ct td{font-size:.82rem;padding:.6rem .9rem;border-bottom:1px solid rgba(30,52,40,.4)}
+.ct tr:hover td{background:rgba(82,183,136,.04)}
+.ct tr:last-child td{border-bottom:none}
+/* POPUP TOOLTIP */
+.tooltip{position:relative;display:inline-flex}
+.tooltip .tip{position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:.5rem .8rem;font-size:.74rem;color:var(--text);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.tooltip:hover .tip{opacity:1}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:var(--mid);border-radius:2px}
+/* RESP */
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}.bh-wrap{flex-direction:column}.ternak-cycle{grid-template-columns:1fr 1fr}.roi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<div class="nav">
+  <button class="nav-tab active" onclick="showSection('investor')" data-tab="investor">
+    <span class="dot" style="background:#F9C74F"></span> Investor
+  </button>
+  <button class="nav-tab" onclick="showSection('relawan')" data-tab="relawan">
+    <span class="dot" style="background:#52B788"></span> Relawan Pendidik
+  </button>
+  <button class="nav-tab" onclick="showSection('petani')" data-tab="petani">
+    <span class="dot" style="background:#4A9ECC"></span> Warga Lokal — Petani
+  </button>
+  <button class="nav-tab" onclick="showSection('ternak')" data-tab="ternak">
+    <span class="dot" style="background:#E67E22"></span> Warga Lokal — Ternak
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 1: INVESTOR
+     ══════════════════════════════════════════════════ -->
+<div id="section-investor" class="section active">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Untuk Investor & Donatur</div>
+    <h1 class="sec-title">Uang Anda Bekerja.<br><em>Sambil Mengubah Hidup.</em></h1>
+    <p class="sec-sub">Bukan donasi biasa. Ini Investasi Generasi — setiap rupiah menghasilkan dampak sosial sekaligus return finansial yang terukur.</p>
+  </div>
+
+  <!-- STAT ROW -->
+  <div class="stat-row">
+    <div class="stat sg"><div class="stat-label">Anak Binaan</div><div class="stat-val">20</div><div class="stat-note">Target Fase 1 (4 Tim)</div></div>
+    <div class="stat sy"><div class="stat-label">Total Investasi</div><div class="stat-val">Rp 462 Jt</div><div class="stat-note">4 Tim @ Rp 115,69 Jt</div></div>
+    <div class="stat sb"><div class="stat-label">ROI Donatur</div><div class="stat-val">10%</div><div class="stat-note">Dari sisa bersih panen</div></div>
+    <div class="stat sr"><div class="stat-label">BEP Estimasi</div><div class="stat-val">Bln 18</div><div class="stat-note">Setelah panen rempah</div></div>
+    <div class="stat sp"><div class="stat-label">SDGs</div><div class="stat-val">7</div><div class="stat-note">Goals aligned</div></div>
+  </div>
+
+  <!-- ROI CALCULATOR -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head">
+      <div class="card-title">💰 Kalkulator ROI Donatur — Cek Estimasi Return Anda</div>
+      <span class="badge b-gold">Interaktif</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div>
+          <div class="roi-input">
+            <div class="roi-label">Nominal Donasi</div>
+            <input type="range" class="roi-slider" id="sl-nominal" min="5000000" max="200000000" step="1000000" value="20000000" oninput="calcROI()">
+            <div class="roi-val" id="lbl-nominal">Rp 20.000.000</div>
+          </div>
+          <div class="roi-input">
+            <div class="roi-label">Paket Pilihan</div>
+            <select id="sel-paket" onchange="calcROI()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.5rem .8rem;border-radius:7px;font-size:.85rem;font-family:inherit;width:100%;outline:none">
+              <option value="0.1">Paket Usaha (ROI 10%)</option>
+              <option value="0.12">Paket Ekspor Rempah (ROI 12%)</option>
+              <option value="0.08">Paket Kasih/Skill (ROI 8%)</option>
+              <option value="0.15">Paket CSR Premium (ROI 15%)</option>
+            </select>
+          </div>
+          <div class="roi-input">
+            <div class="roi-label">Durasi (Bulan)</div>
+            <input type="range" class="roi-slider" id="sl-dur" min="6" max="36" step="1" value="18" oninput="calcROI()">
+            <div class="roi-val" id="lbl-dur">18 bulan</div>
+          </div>
+        </div>
+        <div>
+          <div class="roi-result">
+            <div style="font-size:.72rem;color:var(--mint);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem">Estimasi Return Total</div>
+            <div class="roi-big" id="roi-total">Rp 2.000.000</div>
+            <div class="roi-grid">
+              <div class="roi-item"><div class="rv" id="roi-pct">10%</div><div class="rl">ROI / siklus</div></div>
+              <div class="roi-item"><div class="rv" id="roi-modal">Rp 20 Jt</div><div class="rl">Modal Anda</div></div>
+              <div class="roi-item"><div class="rv" id="roi-bep">Bln 18</div><div class="rl">Est. BEP</div></div>
+            </div>
+          </div>
+          <div style="margin-top:.9rem;padding:.8rem;background:rgba(82,183,136,.06);border:1px solid rgba(82,183,136,.15);border-radius:9px;font-size:.76rem;color:var(--mint)">
+            + 1 anak binaan mendapat pendidikan & skill selama masa investasi Anda
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE PROJECTION -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📈 Proyeksi Revenue 24 Bulan (Rp)</div></div>
+      <div class="card-body"><div class="ch h280"><canvas id="chart-revenue"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">🥧 Komposisi Bagi Hasil</div></div>
+      <div class="card-body">
+        <div class="bh-wrap">
+          <canvas class="bh-chart" id="chart-bagi"></canvas>
+          <div class="bh-legend">
+            <div class="bh-item"><div class="bh-dot" style="background:#2D6A4F"></div><div class="bh-name">Yayasan (Operasional)</div><div class="bh-pct">40%</div></div>
+            <div class="bh-item"><div class="bh-dot" style="background:#F9C74F"></div><div class="bh-name">Donatur (ROI Anda)</div><div class="bh-pct">10%</div></div>
+            <div class="bh-item"><div class="bh-dot" style="background:#E05252"></div><div class="bh-name">Tenaga Lokal</div><div class="bh-pct">40%</div></div>
+            <div class="bh-item"><div class="bh-dot" style="background:#9B59B6"></div><div class="bh-name">Anak Binaan</div><div class="bh-pct">3%</div></div>
+            <div class="bh-item"><div class="bh-dot" style="background:#4A9ECC"></div><div class="bh-name">Manajemen</div><div class="bh-pct">7%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKET PROJECTION -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🌏 Revenue per Komoditi Ekspor (Est. Thn 1, Rp)</div></div>
+      <div class="card-body"><div class="ch h280"><canvas id="chart-komoditi"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">📊 Perbandingan Harga Lokal vs Ekspor</div></div>
+      <div class="card-body">
+        <div class="ch h200"><canvas id="chart-harga"></canvas></div>
+        <div style="margin-top:1rem">
+          <div class="prog"><div class="prog-label"><span>Jahe Merah</span><span>5.3× lebih tinggi di ekspor</span></div><div class="prog-bg"><div class="prog-fill" style="width:85%"></div></div></div>
+          <div class="prog"><div class="prog-label"><span>Kunyit</span><span>7× lebih tinggi di ekspor</span></div><div class="prog-bg"><div class="prog-fill" style="width:93%"></div></div></div>
+          <div class="prog"><div class="prog-label"><span>Kapulaga</span><span>2.7× lebih tinggi di ekspor</span></div><div class="prog-bg"><div class="prog-fill gold" style="width:70%"></div></div></div>
+          <div class="prog"><div class="prog-label"><span>Cabai Merah</span><span>4.8× lebih tinggi di ekspor</span></div><div class="prog-bg"><div class="prog-fill" style="width:80%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head"><div class="card-title">🗺️ Roadmap 5 Tahun & Milestones Keuangan</div></div>
+    <div class="card-body"><div class="ch h200"><canvas id="chart-roadmap"></canvas></div></div>
+  </div>
+
+  <!-- TRANSPARANSI -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">🔍 Sistem Transparansi 24/7 — Yang Membedakan Kami</div></div>
+    <div class="card-body">
+      <div class="g3">
+        <div style="text-align:center;padding:.8rem">
+          <div style="font-size:2rem;margin-bottom:.5rem">📊</div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.3rem">Real-Time Dashboard</div>
+          <div style="font-size:.75rem;color:var(--muted)">Semua transaksi tampil live. Tidak bisa diedit tanpa jejak.</div>
+        </div>
+        <div style="text-align:center;padding:.8rem">
+          <div style="font-size:2rem;margin-bottom:.5rem">📸</div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.3rem">Laporan Foto/Video</div>
+          <div style="font-size:.75rem;color:var(--muted)">Update mingguan lahan, kelas, dan kondisi anak binaan.</div>
+        </div>
+        <div style="text-align:center;padding:.8rem">
+          <div style="font-size:2rem;margin-bottom:.5rem">🤝</div>
+          <div style="font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.3rem">Portal Donatur Login</div>
+          <div style="font-size:.75rem;color:var(--muted)">Lihat ROI, lahan yang Anda sponsori, dan perkembangan anak.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 2: RELAWAN PENDIDIK
+     ══════════════════════════════════════════════════ -->
+<div id="section-relawan" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Untuk Relawan &amp; Mentor Pendidikan</div>
+    <h1 class="sec-title">Skill Anda<br><em>Mengubah Takdir Mereka.</em></h1>
+    <p class="sec-sub">Kami tidak butuh banyak — kami butuh yang tepat. Satu jam Anda tiap minggu bisa membuka pintu yang selama ini tertutup bagi 20 anak.</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat sg"><div class="stat-label">Anak Butuh Didik</div><div class="stat-val">20</div><div class="stat-note">Fase 1</div></div>
+    <div class="stat sy"><div class="stat-label">Relawan Dibutuhkan</div><div class="stat-val">15</div><div class="stat-note">Berbagai bidang</div></div>
+    <div class="stat sb"><div class="stat-label">Jam/Minggu</div><div class="stat-val">2–4 jam</div><div class="stat-note">Fleksibel</div></div>
+    <div class="stat sp"><div class="stat-label">Komitmen Min.</div><div class="stat-val">3 bln</div><div class="stat-note">Bisa diperpanjang</div></div>
+  </div>
+
+  <!-- PROGRAM WHEEL -->
+  <div class="g2" style="margin-bottom:1.4rem">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📚 3 Pilar Program yang Perlu Relawan</div></div>
+      <div class="card-body"><div class="ch h280"><canvas id="chart-pilar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">🎓 Peta Skill yang Diajarkan per Bulan</div></div>
+      <div class="card-body">
+        <div class="timeline" id="tl-kurikulum">
+          <div class="tl-item"><div class="tl-dot active"></div><div class="tl-date">Bulan 1–2</div><div class="tl-title">Fondasi & Orientasi</div><div class="tl-desc">Baca tulis dasar, mengenal angka, eksplorasi minat, trauma-informed care</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Bulan 3–5</div><div class="tl-title">Skill Pertama</div><div class="tl-desc">Paket C modul 1-2, jahit dasar, komputer, desain Canva, irigasi kebun</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Bulan 6–8</div><div class="tl-title">Produksi &amp; Bisnis Mini</div><div class="tl-desc">Produk pertama, jualan online, panen sayur, hitung untung-rugi, pitch sederhana</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Bulan 9–11</div><div class="tl-title">Junior CEO</div><div class="tl-desc">Brand sendiri, digital marketing, business plan, presentasi ke donatur internal</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-date">Bulan 12</div><div class="tl-title">Kelulusan &amp; Demo Day</div><div class="tl-desc">Ujian Paket C, portfolio digital, final pitch, sertifikat skill, siap mandiri</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIDANG DIBUTUHKAN -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head"><div class="card-title">🎯 Bidang Relawan yang Dibutuhkan — Klik untuk Detail</div><span class="badge b-gold">Interaktif</span></div>
+    <div class="card-body">
+      <div class="benefit-grid">
+        <div class="benefit-card gc" onclick="showBidang('guru')">
+          <div class="bc-icon">📖</div>
+          <div class="bc-title">Pengajar / Tutor</div>
+          <div class="bc-text">Paket C setara SMA. Matematika, B.Indonesia, IPA, IPS. Jadwal malam 19:00–21:00.</div>
+          <div style="margin-top:.5rem"><span class="badge b-green">★★★ KRITIS</span><span class="badge b-green" style="margin-left:.3rem">4 Orang</span></div>
+        </div>
+        <div class="benefit-card gp" onclick="showBidang('psiko')">
+          <div class="bc-icon">🧠</div>
+          <div class="bc-title">Psikolog / Konselor</div>
+          <div class="bc-text">Sesi konseling, assessment perkembangan, trauma-informed. Min 1× on-site/minggu.</div>
+          <div style="margin-top:.5rem"><span class="badge b-purple">★★★ KRITIS</span><span class="badge b-purple" style="margin-left:.3rem">2 Orang</span></div>
+        </div>
+        <div class="benefit-card gb" onclick="showBidang('it')">
+          <div class="bc-icon">💻</div>
+          <div class="bc-title">IT / Digital Skills</div>
+          <div class="bc-text">Komputer dasar, medsos bisnis, Canva, website sederhana. Weekend atau malam.</div>
+          <div style="margin-top:.5rem"><span class="badge b-blue">★★ PENTING</span><span class="badge b-blue" style="margin-left:.3rem">2 Orang</span></div>
+        </div>
+        <div class="benefit-card gy" onclick="showBidang('bisnis')">
+          <div class="bc-icon">🚀</div>
+          <div class="bc-title">Mentor Bisnis / Junior CEO</div>
+          <div class="bc-text">Kelas wirausaha, rencana usaha, pitch deck. Entrepreneur / profesional bisnis.</div>
+          <div style="margin-top:.5rem"><span class="badge b-gold">★★ PENTING</span><span class="badge b-gold" style="margin-left:.3rem">2 Orang</span></div>
+        </div>
+        <div class="benefit-card gc" onclick="showBidang('kreatif')">
+          <div class="bc-icon">✂️</div>
+          <div class="bc-title">Skill Kreatif / Jahit</div>
+          <div class="bc-text">Menjahit, kerajinan tangan, batik. Bisa dari komunitas ibu-ibu lokal. Weekend.</div>
+          <div style="margin-top:.5rem"><span class="badge b-green">★★ PENTING</span><span class="badge b-green" style="margin-left:.3rem">2 Orang</span></div>
+        </div>
+        <div class="benefit-card gy" onclick="showBidang('konten')">
+          <div class="bc-icon">📸</div>
+          <div class="bc-title">Fotografi / Konten</div>
+          <div class="bc-text">Dokumentasi kegiatan, konten IG/YouTube yayasan. Content creator / fotografer.</div>
+          <div style="margin-top:.5rem"><span class="badge b-gold">★ BAGUS</span><span class="badge b-gold" style="margin-left:.3rem">1 Orang</span></div>
+        </div>
+      </div>
+      <div id="bidang-detail" style="display:none;margin-top:1rem;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem;animation:fadeUp .25s ease">
+        <div id="bidang-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAMPAK RADAR -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📊 Target Perkembangan Anak (Skala 1–5)</div></div>
+      <div class="card-body"><div class="ch h280"><canvas id="chart-radar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">❤️ Kenapa Bergabung — Kata Relawan</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:1rem">
+        <div style="background:rgba(82,183,136,.06);border:1px solid rgba(82,183,136,.15);border-radius:10px;padding:1rem">
+          <div style="font-size:.82rem;color:var(--mint);line-height:1.7;font-style:italic">"Saya tutor seminggu 2 kali. Tiga bulan kemudian, anak yang tadinya tidak bisa baca, sudah bisa baca dan menghitung. Itu bayaran terbaik."</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">— Relawan Pengajar, Universitas Bogor</div>
+        </div>
+        <div style="background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.15);border-radius:10px;padding:1rem">
+          <div style="font-size:.82rem;color:var(--goldf);line-height:1.7;font-style:italic">"Sebagai psikolog, ini adalah pekerjaan paling bermakna. Mereka bukan kasus — mereka manusia yang butuh didengar."</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">— Psikolog, Rumah Sakit Salak</div>
+        </div>
+        <div style="text-align:center;margin-top:.5rem">
+          <button onclick="window.open('https://nawa-cahaya-dashboard.vercel.app','_blank')" style="background:var(--light);color:var(--deep);padding:.7rem 2rem;border:none;border-radius:9px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">Daftar Jadi Relawan →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 3: PETANI LOKAL
+     ══════════════════════════════════════════════════ -->
+<div id="section-petani" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Untuk Warga Lokal — Petani &amp; Tenaga Kebun</div>
+    <h1 class="sec-title">Bekerja di Kebun Kami.<br><em>Bayaran Lebih dari Gaji.</em></h1>
+    <p class="sec-sub">Sistem gaji advance + bonus panen. Makin rajin, makin besar yang Anda bawa pulang. Pertanian organik 100% — tidak ada pestisida berbahaya.</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat sg"><div class="stat-label">Gaji Advance/Bln</div><div class="stat-val">Rp 2 Jt</div><div class="stat-note">Dibayar duluan setiap bulan</div></div>
+    <div class="stat sy"><div class="stat-label">Bonus Panen</div><div class="stat-val">40%</div><div class="stat-note">Dari sisa bersih hasil panen</div></div>
+    <div class="stat sb"><div class="stat-label">Jam Kerja</div><div class="stat-val">6 jam</div><div class="stat-note">Pagi — fleksibel</div></div>
+    <div class="stat sr"><div class="stat-label">Pestisida</div><div class="stat-val">NOL</div><div class="stat-note">100% organik, aman tubuh</div></div>
+  </div>
+
+  <!-- SISTEM GAJI -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head"><div class="card-title">💰 Sistem Gaji Advance + Bonus Panen — Simulasi Pendapatan</div><span class="badge b-gold">Interaktif</span></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div>
+          <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:1rem">Simulasi Penghasilan Anda</div>
+          <div class="roi-input">
+            <div class="roi-label">Hari Kerja / Bulan</div>
+            <input type="range" class="roi-slider" id="sl-hari" min="10" max="26" step="1" value="20" oninput="calcPetani()">
+            <div class="roi-val" id="lbl-hari">20 hari</div>
+          </div>
+          <div class="roi-input">
+            <div class="roi-label">Komoditi Utama</div>
+            <select id="sel-komoditi" onchange="calcPetani()" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.5rem .8rem;border-radius:7px;font-size:.85rem;font-family:inherit;width:100%;outline:none">
+              <option value="3000000">Jahe Merah (potensi bonus besar)</option>
+              <option value="2500000">Sereh Wangi (perennial, stabil)</option>
+              <option value="4500000">Kapulaga (rempah premium)</option>
+              <option value="2000000">Sayur Resto (panen rutin)</option>
+              <option value="3500000">Cabai Merah</option>
+            </select>
+          </div>
+          <div class="roi-input">
+            <div class="roi-label">Skor Skill (1–10)</div>
+            <input type="range" class="roi-slider" id="sl-skill" min="1" max="10" step="1" value="6" oninput="calcPetani()">
+            <div class="roi-val" id="lbl-skill">Skill 6/10 — Sudah Menguasai Dasar</div>
+          </div>
+        </div>
+        <div>
+          <div class="roi-result">
+            <div style="font-size:.72rem;color:var(--mint);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem">Total Penghasilan / Siklus Panen</div>
+            <div class="roi-big" id="petani-total">Rp 5.000.000</div>
+            <div class="roi-grid">
+              <div class="roi-item"><div class="rv" id="p-advance">Rp 2 Jt/bln</div><div class="rl">Gaji advance</div></div>
+              <div class="roi-item"><div class="rv" id="p-bonus">Rp 3 Jt</div><div class="rl">Bonus panen</div></div>
+              <div class="roi-item"><div class="rv" id="p-hari">Rp 100rb</div><div class="rl">Per hari kerja</div></div>
+            </div>
+          </div>
+          <div style="margin-top:.8rem;font-size:.75rem;color:var(--muted);line-height:1.7">
+            ⚡ Gaji advance = <strong style="color:var(--text)">dibayar tiap bulan, pasti</strong><br>
+            🌾 Bonus panen = <strong style="color:var(--goldf)">makin bagus hasil kebun, makin besar bonus</strong><br>
+            📈 Skor skill naik = porsi bonus naik otomatis
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERBANDINGAN KOMODITI -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🌿 Potensi Bonus per Komoditi (Rp / Siklus Panen)</div></div>
+      <div class="card-body"><div class="ch h280"><canvas id="chart-petani-bonus"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">🗓️ Kalender Panen — Kapan Ada Bonus?</div></div>
+      <div class="card-body">
+        <div style="overflow-x:auto">
+          <table class="ct">
+            <tr><th>Komoditi</th><th>Tanam</th><th>Panen</th><th>Siklus</th><th>Bonus Est.</th></tr>
+            <tr><td>🥬 Sayur Mix</td><td>Bln 1</td><td>Bln 2–3</td><td>21–30 hari</td><td style="color:var(--light);font-weight:600">Rp 500rb–1 Jt</td></tr>
+            <tr><td>🍅 Tomat</td><td>Bln 1</td><td>Bln 4</td><td>3–4 bln</td><td style="color:var(--light);font-weight:600">Rp 1–2 Jt</td></tr>
+            <tr><td>🌾 Sereh Wangi</td><td>Bln 2</td><td>Bln 5+</td><td>3 bln (perennial)</td><td style="color:var(--goldf);font-weight:600">Rp 1,5–3 Jt</td></tr>
+            <tr><td>🌿 Jahe Merah</td><td>Bln 1</td><td>Bln 9–10</td><td>8–10 bln</td><td style="color:var(--goldf);font-weight:600">Rp 3–5 Jt</td></tr>
+            <tr><td>🌼 Kunyit</td><td>Bln 1</td><td>Bln 9–10</td><td>8–10 bln</td><td style="color:var(--goldf);font-weight:600">Rp 2–4 Jt</td></tr>
+            <tr><td>🌱 Kapulaga</td><td>Bln 1</td><td>Bln 18+</td><td>18–24 bln</td><td style="color:var(--red);font-weight:600">Rp 8–15 Jt 🔥</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORGANIK SISTEM -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head"><div class="card-title">🌿 Sistem Pertanian Organik — Aman, Sehat, Premium</div></div>
+    <div class="card-body">
+      <div class="flow">
+        <div class="flow-box">🐐 Kotoran Ternak</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box highlight">♻️ Kompos Organik</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box">🌿 Pupuk ke Kebun</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box gold">🌾 Hasil Panen Premium</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box highlight">💰 Harga Ekspor Tinggi</div>
+      </div>
+      <div class="g3" style="margin-top:1rem">
+        <div style="background:rgba(82,183,136,.06);border:1px solid rgba(82,183,136,.15);border-radius:10px;padding:.9rem">
+          <div style="font-size:.9rem;font-weight:700;color:var(--light);margin-bottom:.3rem">🚫 TIDAK PAKAI</div>
+          <div style="font-size:.78rem;color:var(--muted)">Pestisida kimia · Pupuk sintetis berlebihan · Hormone growth · Zat berbahaya</div>
+        </div>
+        <div style="background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.15);border-radius:10px;padding:.9rem">
+          <div style="font-size:.9rem;font-weight:700;color:var(--goldf);margin-bottom:.3rem">✅ YANG DIPAKAI</div>
+          <div style="font-size:.78rem;color:var(--muted)">Kompos kotoran ternak · MOL (Mikroorganisme Lokal) · Pestisida serai+bawang putih · Biourin</div>
+        </div>
+        <div style="background:rgba(74,158,204,.06);border:1px solid rgba(74,158,204,.15);border-radius:10px;padding:.9rem">
+          <div style="font-size:.9rem;font-weight:700;color:var(--blue);margin-bottom:.3rem">💚 MANFAAT UNTUK ANDA</div>
+          <div style="font-size:.78rem;color:var(--muted)">Kulit tidak iritasi · Tidak sesak napas · Tanah sehat jangka panjang · Bisa konsumsi sendiri</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">📊 Perbandingan Penghasilan Petani Biasa vs Nawa Cahaya</div></div>
+    <div class="card-body"><div class="ch h240"><canvas id="chart-compare-petani"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SECTION 4: PETERNAK LOKAL
+     ══════════════════════════════════════════════════ -->
+<div id="section-ternak" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Untuk Warga Lokal — Peternak &amp; Tenaga Kandang</div>
+    <h1 class="sec-title">Rawat Ternak Kami.<br><em>Hasilnya Kita Bagi.</em></h1>
+    <p class="sec-sub">Kandang sudah dibangun. Modal sudah ada. Anda tinggal rawat dan panen hasilnya. Sistem advance — dibayar sebelum panen.</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat sg"><div class="stat-label">Ternak Awal</div><div class="stat-val">2 Pasang</div><div class="stat-note">Kambing PE + 20 Ayam</div></div>
+    <div class="stat sy"><div class="stat-label">Telur Harian</div><div class="stat-val">15–18</div><div class="stat-note">Butir/hari dari 20 ayam</div></div>
+    <div class="stat sb"><div class="stat-label">Gaji Advance</div><div class="stat-val">Rp 1,5 Jt</div><div class="stat-note">Per bulan, pasti</div></div>
+    <div class="stat sr"><div class="stat-label">Bonus</div><div class="stat-val">40%</div><div class="stat-note">Dari hasil jual ternak/susu</div></div>
+  </div>
+
+  <!-- PILIH TERNAK INTERAKTIF -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head"><div class="card-title">🐾 Pilih Jenis Ternak — Lihat Detail &amp; Potensi Penghasilan</div><span class="badge b-gold">Interaktif</span></div>
+    <div class="card-body">
+      <div class="ternak-cycle">
+        <div class="tc-card active-tc" onclick="showTernak('kambing')">
+          <div class="tc-icon">🐐</div>
+          <div class="tc-name">Kambing PE</div>
+          <div class="tc-val">2 pasang · Susu + Daging</div>
+        </div>
+        <div class="tc-card" onclick="showTernak('ayam')">
+          <div class="tc-icon">🐔</div>
+          <div class="tc-name">Ayam Petelur</div>
+          <div class="tc-val">20 ekor · Telur Harian</div>
+        </div>
+        <div class="tc-card" onclick="showTernak('sapi')">
+          <div class="tc-icon">🐄</div>
+          <div class="tc-name">Sapi Limosin</div>
+          <div class="tc-val">Fase 2 · Penggemukan</div>
+        </div>
+      </div>
+      <div id="ternak-detail" class="tc-detail">
+        <div id="ternak-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📈 Proyeksi Produksi Ternak (12 Bulan)</div></div>
+      <div class="card-body"><div class="ch h280"><canvas id="chart-ternak-prod"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">♻️ Siklus Circular Economy — Zero Waste</div></div>
+      <div class="card-body">
+        <div class="flow" style="flex-direction:column;gap:.6rem">
+          <div style="display:flex;align-items:center;gap:.7rem">
+            <div class="flow-box" style="min-width:120px;max-width:140px">🌿 Sisa Sayur &amp; Kulit Buah</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box highlight" style="min-width:120px;max-width:140px">🐐 Pakan Ternak (GRATIS)</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.7rem">
+            <div class="flow-box" style="min-width:120px;max-width:140px">💩 Kotoran Ternak</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box highlight" style="min-width:120px;max-width:140px">🌱 Pupuk Kebun (GRATIS)</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.7rem">
+            <div class="flow-box" style="min-width:120px;max-width:140px">⛽ Gas Biodigester</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box gold" style="min-width:120px;max-width:140px">🔥 Kompor Dapur (GRATIS)</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.7rem">
+            <div class="flow-box" style="min-width:120px;max-width:140px">🥛 Susu Kambing</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box gold" style="min-width:120px;max-width:140px">💰 Jual Rp 15rb–20rb/L</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;background:rgba(82,183,136,.07);border:1px solid rgba(82,183,136,.2);border-radius:9px;padding:.8rem;font-size:.78rem;color:var(--mint)">
+          💡 Sistem Circular Economy: ternak memberi makan kebun, kebun memberi makan ternak. Biaya operasional turun 30–40%.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOP TERNAK SEDERHANA -->
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="card-head"><div class="card-title">📋 Jadwal Harian Peternak — Mudah Dipelajari</div></div>
+    <div class="card-body">
+      <div style="overflow-x:auto">
+        <table class="ct">
+          <tr><th>Waktu</th><th>Kegiatan</th><th>Durasi</th><th>Catatan</th></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">05:30</td><td>Beri makan ayam + cek telur</td><td>30 mnt</td><td>Catat jumlah telur di logbook</td></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">06:00</td><td>Beri makan kambing + cek kondisi</td><td>20 mnt</td><td>Perhatikan nafsu makan & kesehatan</td></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">06:20</td><td>Bersihkan kandang ayam</td><td>20 mnt</td><td>Kumpulkan kotoran ke tempat kompos</td></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">06:40</td><td>Kumpulkan kotoran kambing</td><td>15 mnt</td><td>Masukkan ke biodigester/kompos pit</td></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">07:00</td><td>Bantu kebun (irigasi, panen)</td><td>3–4 jam</td><td>Rotasi bersama tim kebun</td></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">15:00</td><td>Pakan sore + cek air minum</td><td>20 mnt</td><td>Pastikan air selalu tersedia</td></tr>
+          <tr><td style="color:var(--goldf);font-weight:600">17:00</td><td>Tutup kandang + laporan hari</td><td>10 mnt</td><td>Isi form digital via HP</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">💰 Simulasi Penghasilan Total Peternak per Tahun</div></div>
+    <div class="card-body"><div class="ch h280"><canvas id="chart-ternak-income"></canvas></div></div>
+  </div>
+</div>
+
+<script>
+// ── CHART DEFAULTS ────────────────────────────────
+const CC={text:"rgba(232,240,235,.7)",grid:"rgba(30,52,40,.7)"};
+Chart.defaults.color=CC.text;Chart.defaults.borderColor=CC.grid;
+Chart.defaults.font.family="DM Sans";
+const charts={};
+function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+// ── NAV ───────────────────────────────────────────
+function showSection(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("section-"+id).classList.add("active");
+  document.querySelector(`[data-tab="${id}"]`).classList.add("active");
+  setTimeout(()=>initCharts(id),50);
+}
+
+// ── ROI CALC ─────────────────────────────────────
+function calcROI(){
+  const nom=parseInt(document.getElementById("sl-nominal").value);
+  const roi=parseFloat(document.getElementById("sel-paket").value);
+  const dur=parseInt(document.getElementById("sl-dur").value);
+  document.getElementById("lbl-nominal").textContent="Rp "+nom.toLocaleString("id-ID");
+  document.getElementById("lbl-dur").textContent=dur+" bulan";
+  const ret=Math.round(nom*roi*(dur/12));
+  document.getElementById("roi-total").textContent="Rp "+ret.toLocaleString("id-ID");
+  document.getElementById("roi-pct").textContent=Math.round(roi*100)+"%";
+  document.getElementById("roi-modal").textContent="Rp "+(nom>=1e9?(nom/1e9).toFixed(1)+" M":nom>=1e6?(nom/1e6).toFixed(0)+" Jt":(nom/1e3).toFixed(0)+" Rb");
+  document.getElementById("roi-bep").textContent="Bln "+Math.ceil(12/roi);
+}
+calcROI();
+
+// ── PETANI CALC ───────────────────────────────────
+function calcPetani(){
+  const hari=parseInt(document.getElementById("sl-hari").value);
+  const bonusPot=parseInt(document.getElementById("sel-komoditi").value);
+  const skill=parseInt(document.getElementById("sl-skill").value);
+  const labels=["","Sangat Pemula","Pemula","Cukup","","Dasar OK","","Menguasai","","Mahir","Master"];
+  document.getElementById("lbl-hari").textContent=hari+" hari";
+  document.getElementById("lbl-skill").textContent="Skill "+skill+"/10 — "+labels[skill];
+  const advance=Math.round(hari*100000);
+  const bonus=Math.round(bonusPot*(skill/10)*0.8);
+  const total=advance+bonus;
+  const harian=Math.round(total/(hari||1));
+  document.getElementById("petani-total").textContent="Rp "+total.toLocaleString("id-ID");
+  document.getElementById("p-advance").textContent="Rp "+(advance/1e6).toFixed(1)+" Jt";
+  document.getElementById("p-bonus").textContent="Rp "+(bonus/1e6).toFixed(1)+" Jt";
+  document.getElementById("p-hari").textContent="Rp "+(harian/1000).toFixed(0)+" Rb";
+}
+calcPetani();
+
+// ── BIDANG DETAIL ─────────────────────────────────
+const bidangData={
+  guru:{title:"📖 Pengajar / Tutor Paket C",color:"var(--light)",items:["Mata pelajaran: Matematika, B. Indonesia, IPA, IPS","Jadwal: Senin–Jumat, 19:00–21:00 (pilih 2–3 hari)","Lokasi: On-site di Bogor atau via Zoom (hybrid OK)","Min. pendidikan: S1 atau mahasiswa semester akhir","Sertifikat relawan + surat pengabdian diterbitkan","Prioritas: ★★★ KRITIS — tanpa pengajar, program berhenti"]},
+  psiko:{title:"🧠 Psikolog / Konselor Anak",color:"var(--purple)",items:["Sesi konseling individual & kelompok","Minimal 1× on-site per minggu (2–3 jam)","Background: psikologi klinis, konseling, atau sosial","Tools yang digunakan sudah disediakan yayasan","Laporan sesi terjaga kerahasiaannya","Prioritas: ★★★ KRITIS — anak trauma butuh pendampingan"]},
+  it:{title:"💻 IT / Digital Skills",color:"var(--blue)",items:["Materi: komputer dasar, email, WA bisnis, Canva, medsos","Jadwal: Weekend (Sabtu/Minggu) pagi 09:00–11:00","Tidak harus full time — 2× sebulan pun sudah membantu","Tools: laptop sudah tersedia di kelas","Bisa remote/hybrid untuk materi online","Prioritas: ★★ PENTING — era digital, skill ini wajib"]},
+  bisnis:{title:"🚀 Mentor Bisnis / Junior CEO",color:"var(--gold)",items:["Program Junior CEO: anak binaan belajar wirausaha","Materi: hitung untung-rugi, pitch deck, rencana usaha","Jadwal: 2× sebulan on-site atau virtual","Background: entrepreneur, profesional bisnis, konsultan","Anak akan presentasi bisnis plan ke Anda di akhir program","Prioritas: ★★ PENTING — ini yang membentuk mental mandiri"]},
+  kreatif:{title:"✂️ Skill Kreatif & Jahit",color:"var(--light)",items:["Mengajar menjahit, kerajinan tangan, sablon, batik","Jadwal: Sabtu 09:00–12:00 (atau sesuai kesepakatan)","Produk hasil anak bisa dijual ke donatur & online","Bisa dari komunitas ibu-ibu PKK, kelompok pengajian","Alat jahit sudah tersedia di yayasan","Prioritas: ★★ PENTING — skill ini bisa langsung menghasilkan"]},
+  konten:{title:"📸 Fotografi / Konten Media",color:"var(--gold)",items:["Dokumentasi kegiatan harian, panen, kelas, progress anak","Buat konten untuk IG, YouTube, dan laporan donatur","Jadwal: 1–2× per bulan on-site + remote editing","Kamera bisa pake HP — yang penting angle & storytelling","Konten lo yang menarik = lebih banyak donatur masuk","Prioritas: ★ BAGUS — bantu fundraising & awareness"]}
+};
+function showBidang(key){
+  const d=bidangData[key];
+  const el=document.getElementById("bidang-detail");
+  const con=document.getElementById("bidang-content");
+  con.innerHTML=`<div style="font-size:.95rem;font-weight:700;color:${d.color};margin-bottom:.7rem">${d.title}</div>`+
+    d.items.map(i=>`<div style="display:flex;gap:.5rem;margin-bottom:.4rem;font-size:.8rem;color:var(--muted)"><span style="color:${d.color};flex-shrink:0">✓</span>${i}</div>`).join("");
+  el.style.display="block";
+}
+
+// ── TERNAK DETAIL ─────────────────────────────────
+const ternakData={
+  kambing:{
+    title:"🐐 Kambing PE (Peranakan Etawa)",
+    items:[
+      ["Populasi","2 pasang = 1 jantan + 3 betina"],
+      ["Hasil utama","Susu kambing 1–2L/hari/ekor betina menyusui"],
+      ["Harga susu","Rp 15.000–20.000/liter (pasar lokal)"],
+      ["Anak kambing","Lahir tiap 7–9 bulan, jual @ Rp 1,5–2,5 Jt"],
+      ["Kotoran","→ Kompos kebun (gratis, tidak perlu beli pupuk)"],
+      ["Gaji advance","Rp 1.500.000 / bulan (pasti dibayar)"],
+      ["Bonus panen","40% dari revenue susu + anak kambing — tergantung performa"],
+    ],
+    note:"Tips: Kambing PE lebih produktif dengan pakan daun singkong + rumput gajah. Cegah stres = produksi susu naik."
+  },
+  ayam:{
+    title:"🐔 Ayam Petelur Layer",
+    items:[
+      ["Populasi","20 ekor ayam layer (umur 18–72 minggu produktif)"],
+      ["Produksi telur","15–18 butir/hari (tingkat produksi ~80%)"],
+      ["Harga telur","Rp 2.000/butir = Rp 30.000–36.000/hari"],
+      ["Pendapatan bulanan","Rp 900rb–1,1 Jt dari telur saja"],
+      ["Kotoran","→ Kompos cepat matang, nitrogen tinggi"],
+      ["Gaji advance","Rp 800.000 / bulan (kandang + telur)"],
+      ["Bonus","40% dari revenue telur yang dijual ke luar dapur"],
+    ],
+    note:"Tips: Pastikan ayam tidak stres (tidak bising, cahaya 16 jam). Telur yang tidak terjual ke dapur yayasan = hemat biaya makan anak."
+  },
+  sapi:{
+    title:"🐄 Sapi Limosin (Fase 2)",
+    items:[
+      ["Status","Masuk Fase 2 setelah modal kebun balik"],
+      ["Skema","Penggemukan: beli bakalan 270kg → jual 450kg (6 bulan)"],
+      ["Keuntungan/ekor","±Rp 4–6 Jt per siklus penggemukan"],
+      ["Kotoran","→ Biogas (kompor gratis) + slurry pupuk premium"],
+      ["Gaji advance","Rp 2.000.000 / bulan (scale up)"],
+      ["Kebutuhan SDM","1–2 orang dedicated peternak sapi"],
+      ["Timeline","Mulai rekrut peternak sapi di Bulan 12–15"],
+    ],
+    note:"Kotoran sapi = biogas terbaik. 1 ekor sapi menghasilkan cukup gas untuk 2 kompor sepanjang hari. Gratis selamanya."
+  }
+};
+function showTernak(key){
+  const d=ternakData[key];
+  document.querySelectorAll(".tc-card").forEach(c=>c.classList.remove("active-tc"));
+  event.currentTarget.classList.add("active-tc");
+  document.getElementById("ternak-content").innerHTML=
+    `<div style="font-size:.92rem;font-weight:700;color:var(--goldf);margin-bottom:.9rem">${d.title}</div>`+
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem">`+
+    d.items.map(([k,v])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem"><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem">${k}</div><div style="font-size:.82rem;color:var(--text);font-weight:500">${v}</div></div>`).join("")+
+    `</div><div style="background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.2);border-radius:8px;padding:.7rem;font-size:.78rem;color:var(--goldf)">💡 ${d.note}</div>`;
+  document.getElementById("ternak-detail").style.display="block";
+}
+showTernak("kambing");
+
+// ── CHARTS ───────────────────────────────────────
+function initCharts(section){
+  if(section==="investor"){
+    initRevenueChart();initBagiChart();initKomoditiChart();initHargaChart();initRoadmapChart();
+  } else if(section==="relawan"){
+    initPilarChart();initRadarChart();
+  } else if(section==="petani"){
+    initPetaniBonusChart();initComparePetaniChart();
+  } else if(section==="ternak"){
+    initTernakProdChart();initTernakIncomeChart();
+  }
+}
+
+function initRevenueChart(){
+  dc("revenue");
+  const ctx=document.getElementById("chart-revenue");if(!ctx)return;
+  const months=["Bln 1","Bln 2","Bln 3","Bln 4","Bln 5","Bln 6","Bln 7","Bln 8","Bln 9","Bln 10","Bln 11","Bln 12","Bln 14","Bln 16","Bln 18","Bln 20","Bln 22","Bln 24"];
+  const donasi=[15,20,25,30,35,40,45,50,55,60,65,70,80,90,100,115,130,150].map(v=>v*1e6);
+  const kebun=[0,0,0,0,0,3,3.5,4,4,5,5,6,7,8,9,10,12,15].map(v=>v*1e6);
+  const ternak=[0,0,.5,.5,.5,.75,1,1,1,1.2,1.2,1.5,2,2.5,3,3.5,4,5].map(v=>v*1e6);
+  charts["revenue"]=new Chart(ctx,{type:"bar",data:{labels:months,datasets:[
+    {label:"Donasi",data:donasi,backgroundColor:"rgba(212,160,23,.6)",borderRadius:4,stack:"a"},
+    {label:"Kebun",data:kebun,backgroundColor:"rgba(82,183,136,.7)",borderRadius:4,stack:"a"},
+    {label:"Ternak",data:ternak,backgroundColor:"rgba(74,158,204,.6)",borderRadius:4,stack:"a"},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:11},boxWidth:12}}},scales:{x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}},y:{ticks:{color:CC.text,font:{size:9},callback:v=>v>=1e6?(v/1e6).toFixed(0)+" Jt":v},grid:{color:CC.grid}},stacked:true}}});
+}
+
+function initBagiChart(){
+  dc("bagi");
+  const ctx=document.getElementById("chart-bagi");if(!ctx)return;
+  charts["bagi"]=new Chart(ctx,{type:"doughnut",data:{labels:["Yayasan 40%","Donatur 10%","Tenaga Lokal 40%","Anak Binaan 3%","Manajemen 7%"],datasets:[{data:[40,10,40,3,7],backgroundColor:["#2D6A4F","#F9C74F","#E05252","#9B59B6","#4A9ECC"],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:"68%"}});
+}
+
+function initKomoditiChart(){
+  dc("komoditi");
+  const ctx=document.getElementById("chart-komoditi");if(!ctx)return;
+  charts["komoditi"]=new Chart(ctx,{type:"bar",data:{labels:["Jahe Merah","Kunyit","Sereh Wangi","Kapulaga","Cabai Merah","Sayur Resto"],datasets:[
+    {label:"Lokal",data:[225,75,9,225,437.5,45].map(v=>v*1e6),backgroundColor:"rgba(82,183,136,.5)",borderRadius:4},
+    {label:"Ekspor",data:[525,175,195,450,0,0].map(v=>v*1e6),backgroundColor:"rgba(26,82,118,.7)",borderRadius:4},
+  ]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",plugins:{legend:{labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{x:{ticks:{color:CC.text,font:{size:9},callback:v=>v>=1e6?(v/1e6).toFixed(0)+" Jt":""},grid:{color:CC.grid}},y:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}}}}});
+}
+
+function initHargaChart(){
+  dc("harga");
+  const ctx=document.getElementById("chart-harga");if(!ctx)return;
+  charts["harga"]=new Chart(ctx,{type:"bar",data:{labels:["Jahe
+Merah","Kunyit","Cabai
+Merah","Kapulaga","Sereh"],datasets:[
+    {label:"Lokal (Rp/kg)",data:[15000,5000,25000,150000,3000],backgroundColor:"rgba(82,183,136,.5)",borderRadius:4},
+    {label:"Ekspor (Rp/kg)",data:[80000,35000,120000,400000,130000],backgroundColor:"rgba(212,160,23,.7)",borderRadius:4},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}},y:{ticks:{color:CC.text,font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+"rb":v},grid:{color:CC.grid}}}}});
+}
+
+function initRoadmapChart(){
+  dc("roadmap");
+  const ctx=document.getElementById("chart-roadmap");if(!ctx)return;
+  charts["roadmap"]=new Chart(ctx,{type:"line",data:{labels:["Fase 0","Thn 1","Thn 2","Thn 3","Thn 4","Thn 5"],datasets:[
+    {label:"Donasi Terkumpul (Rp Jt)",data:[0,200,400,700,1100,1800],borderColor:"#F9C74F",backgroundColor:"rgba(212,160,23,.1)",fill:true,tension:.4,pointBackgroundColor:"#F9C74F",pointRadius:5},
+    {label:"Revenue Usaha (Rp Jt)",data:[0,20,120,350,700,1200],borderColor:"#52B788",backgroundColor:"rgba(82,183,136,.1)",fill:true,tension:.4,pointBackgroundColor:"#52B788",pointRadius:5},
+    {label:"Anak Binaan",data:[0,20,40,60,100,150],borderColor:"#9B59B6",backgroundColor:"rgba(155,89,182,.1)",fill:false,tension:.4,yAxisID:"y1",pointBackgroundColor:"#9B59B6",pointRadius:5},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{y:{ticks:{color:CC.text,font:{size:9},callback:v=>v+" Jt"},grid:{color:CC.grid}},y1:{position:"right",ticks:{color:"#9B59B6",font:{size:9},callback:v=>v+" anak"},grid:{display:false}},x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}}}}});
+}
+
+function initPilarChart(){
+  dc("pilar");
+  const ctx=document.getElementById("chart-pilar");if(!ctx)return;
+  charts["pilar"]=new Chart(ctx,{type:"polarArea",data:{labels:["Kasih — Pendidikan","Menjaga — Skill","Membentuk — Usaha","Psikologi & Karakter","Junior CEO Program"],datasets:[{data:[30,25,20,15,10],backgroundColor:["rgba(82,183,136,.7)","rgba(74,158,204,.7)","rgba(212,160,23,.7)","rgba(155,89,182,.7)","rgba(224,82,82,.7)"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{r:{ticks:{display:false},grid:{color:CC.grid}}}}});
+}
+
+function initRadarChart(){
+  dc("radar");
+  const ctx=document.getElementById("chart-radar");if(!ctx)return;
+  charts["radar"]=new Chart(ctx,{type:"radar",data:{labels:["Akademik","Skill Kreatif","Digital","Pertanian","Psikologi","Kepemimpinan","Sosial"],datasets:[
+    {label:"Target Akhir Bln 12",data:[4.5,4,4,4,4.2,3.8,4.5],backgroundColor:"rgba(82,183,136,.15)",borderColor:"rgba(82,183,136,.8)",pointBackgroundColor:"#52B788",borderWidth:2,pointRadius:4},
+    {label:"Rata-rata Masuk (Est.)",data:[1.5,1.2,1,1.8,2,1.3,2.2],backgroundColor:"rgba(224,82,82,.1)",borderColor:"rgba(224,82,82,.5)",pointBackgroundColor:"#E05252",borderWidth:1,pointRadius:3},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{r:{ticks:{color:CC.text,backdropColor:"transparent",font:{size:8}},grid:{color:CC.grid},pointLabels:{color:CC.text,font:{size:10}},min:0,max:5}}}});
+}
+
+function initPetaniBonusChart(){
+  dc("petani-bonus");
+  const ctx=document.getElementById("chart-petani-bonus");if(!ctx)return;
+  charts["petani-bonus"]=new Chart(ctx,{type:"bar",data:{labels:["Sayur
+Mix","Tomat","Sereh
+Wangi","Jahe
+Merah","Kunyit","Cabai
+Merah","Kapulaga
+(Thn 2)"],datasets:[{label:"Estimasi Bonus Panen (Rp)",data:[750000,1500000,2250000,4000000,3000000,3500000,12000000],backgroundColor:["rgba(82,183,136,.6)","rgba(82,183,136,.6)","rgba(212,160,23,.6)","rgba(212,160,23,.7)","rgba(212,160,23,.7)","rgba(212,160,23,.7)","rgba(224,82,82,.8)"],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}},y:{ticks:{color:CC.text,font:{size:9},callback:v=>v>=1e6?(v/1e6).toFixed(1)+" Jt":(v/1e3).toFixed(0)+"rb"},grid:{color:CC.grid}}}}});
+}
+
+function initComparePetaniChart(){
+  dc("compare-petani");
+  const ctx=document.getElementById("chart-compare-petani");if(!ctx)return;
+  charts["compare-petani"]=new Chart(ctx,{type:"bar",data:{labels:["Buruh tani harian","Petani mandiri
+(lahan sendiri)","Petani plasma
+perusahaan","Petani Nawa Cahaya
+(advance+bonus)"],datasets:[{label:"Penghasilan/Bulan (Rp)",data:[1200000,1800000,2200000,4500000],backgroundColor:["rgba(107,143,120,.5)","rgba(107,143,120,.5)","rgba(107,143,120,.5)","rgba(212,160,23,.8)"],borderRadius:6,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}},y:{ticks:{color:CC.text,font:{size:9},callback:v=>(v/1e6).toFixed(1)+" Jt"},grid:{color:CC.grid}}}}});
+}
+
+function initTernakProdChart(){
+  dc("ternak-prod");
+  const ctx=document.getElementById("chart-ternak-prod");if(!ctx)return;
+  charts["ternak-prod"]=new Chart(ctx,{type:"line",data:{labels:["Bln 1","Bln 2","Bln 3","Bln 4","Bln 5","Bln 6","Bln 7","Bln 8","Bln 9","Bln 10","Bln 11","Bln 12"],datasets:[
+    {label:"Telur Ayam (butir/hari)",data:[0,5,12,16,17,18,18,17,16,15,14,14],borderColor:"#F9C74F",backgroundColor:"rgba(212,160,23,.1)",fill:true,tension:.4,pointRadius:4,pointBackgroundColor:"#F9C74F"},
+    {label:"Susu Kambing (L/hari)",data:[0,0,1,1.5,2,2.5,2.5,2,2,2,1.5,1.5],borderColor:"#52B788",backgroundColor:"rgba(82,183,136,.1)",fill:true,tension:.4,pointRadius:4,pointBackgroundColor:"#52B788",yAxisID:"y1"},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{y:{ticks:{color:"#F9C74F",font:{size:9},callback:v=>v+" butir"},grid:{color:CC.grid}},y1:{position:"right",ticks:{color:"#52B788",font:{size:9},callback:v=>v+" L"},grid:{display:false}},x:{ticks:{color:CC.text,font:{size:9}},grid:{display:false}}}}});
+}
+
+function initTernakIncomeChart(){
+  dc("ternak-income");
+  const ctx=document.getElementById("chart-ternak-income");if(!ctx)return;
+  charts["ternak-income"]=new Chart(ctx,{type:"bar",data:{labels:["Q1","Q2","Q3","Q4"],datasets:[
+    {label:"Gaji Advance (Rp)",data:[4500000,4500000,4500000,4500000],backgroundColor:"rgba(82,183,136,.6)",borderRadius:4,stack:"s"},
+    {label:"Bonus Telur (Rp)",data:[500000,1500000,2500000,2500000],backgroundColor:"rgba(212,160,23,.6)",borderRadius:4,stack:"s"},
+    {label:"Bonus Susu (Rp)",data:[0,800000,2000000,2200000],backgroundColor:"rgba(74,158,204,.6)",borderRadius:4,stack:"s"},
+    {label:"Bonus Anak Kambing (Rp)",data:[0,0,1500000,2500000],backgroundColor:"rgba(155,89,182,.6)",borderRadius:4,stack:"s"},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:CC.text,font:{size:10},boxWidth:12}}},scales:{x:{ticks:{color:CC.text,font:{size:10}},grid:{display:false}},y:{ticks:{color:CC.text,font:{size:9},callback:v=>v>=1e6?(v/1e6).toFixed(1)+" Jt":(v/1e3).toFixed(0)+"rb"},grid:{color:CC.grid}},stacked:true}}});
+}
+
+// INIT
+document.addEventListener("DOMContentLoaded",()=>{
+  initCharts("investor");
+  showBidang("guru");
+  // Animate progress bars
+  setTimeout(()=>{document.querySelectorAll(".prog-fill").forEach(b=>{const w=b.style.width;b.style.width="0";setTimeout(()=>b.style.width=w,100);});},300);
+});
+</script>
+</body>
+</html>
