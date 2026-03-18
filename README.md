@@ -3,9 +3,9 @@
 Platform donasi investasi transparan untuk yayasan pemberdayaan anak.
 
 ## Login Demo
-- Admin: `admin` / `admin123`
-- Donatur: `donatur` / `donor123`
-- Relawan: `relawan` / `relawan123`
+- Admin: `admin` / `admin168`
+- Donatur: `donatur` / `donor88`
+- Relawan: `relawan` / `relawan88`
 - Publik: Pilih tab Publik → langsung masuk
 
 ## Setup Google Sheets
